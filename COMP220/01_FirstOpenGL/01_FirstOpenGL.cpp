@@ -9,6 +9,12 @@
 // Code has been copied and pasted from tutorials which use different conventions.
 // In your own projects, make sure you rename identifiers to follow a consistent style.
 
+void showErrorMessage(const char* message, const char* title)
+{
+	// Note: this is specific to Windows, and would need redefining to work on Mac or Linux
+	MessageBoxA(nullptr, message, title, MB_OK | MB_ICONERROR);
+}
+
 bool compileShader(GLuint shaderId, const std::string& shaderFileName)
 {
 	// Read the source code from the file
@@ -23,7 +29,7 @@ bool compileShader(GLuint shaderId, const std::string& shaderFileName)
 	}
 	else
 	{
-		MessageBoxA(nullptr, shaderFileName.c_str(), "File not found", MB_OK | MB_ICONERROR);
+		showErrorMessage(shaderFileName.c_str(), "File not found");
 		return false;
 	}
 
@@ -42,7 +48,7 @@ bool compileShader(GLuint shaderId, const std::string& shaderFileName)
 		// Display the compilation log
 		std::vector<char> errorMessage(infoLogLength + 1);
 		glGetShaderInfoLog(shaderId, infoLogLength, NULL, errorMessage.data());
-		MessageBoxA(nullptr, errorMessage.data(), shaderFileName.c_str(), MB_OK | MB_ICONWARNING);
+		showErrorMessage(errorMessage.data(), shaderFileName.c_str());
 	}
 
 	return (result != GL_FALSE);
@@ -71,7 +77,7 @@ GLuint loadShaders(const std::string& vertex_file_path, const std::string& fragm
 	if (infoLogLength > 0) {
 		std::vector<char> errorMessage(infoLogLength + 1);
 		glGetProgramInfoLog(programId, infoLogLength, NULL, errorMessage.data());
-		MessageBoxA(nullptr, errorMessage.data(), "glLinkProgram error", MB_OK | MB_ICONWARNING);
+		showErrorMessage(errorMessage.data(), "glLinkProgram error");
 	}
 
 	glDetachShader(programId, vertexShaderId);
@@ -87,7 +93,7 @@ int main(int argc, char* args[])
 {
 	if (SDL_Init(SDL_INIT_VIDEO) < 0)
 	{
-		MessageBoxA(nullptr, "SDL_Init failed", SDL_GetError(), MB_OK | MB_ICONERROR);
+		showErrorMessage("SDL_Init failed", SDL_GetError());
 		return 1;
 	}
 
@@ -100,7 +106,7 @@ int main(int argc, char* args[])
 
 	if (window == nullptr)
 	{
-		MessageBoxA(nullptr, "SDL_CreateWindow failed", SDL_GetError(), MB_OK | MB_ICONERROR);
+		showErrorMessage("SDL_CreateWindow failed", SDL_GetError());
 		return 1;
 	}
 
@@ -108,13 +114,13 @@ int main(int argc, char* args[])
 
 	if (glContext == nullptr)
 	{
-		MessageBoxA(nullptr, "SDL_GL_CreateContext failed", SDL_GetError(), MB_OK | MB_ICONERROR);
+		showErrorMessage("SDL_GL_CreateContext failed", SDL_GetError());
 		return 1;
 	}
 
 	if (glewInit() != GLEW_OK)
 	{
-		MessageBoxA(nullptr, "glewInit failed", ":(", MB_OK | MB_ICONERROR);
+		showErrorMessage("glewInit failed", ":(");
 	}
 
 	GLuint VertexArrayID;
