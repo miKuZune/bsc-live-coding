@@ -250,3 +250,6 @@ paket-files/
 # JetBrains Rider
 .idea/
 *.sln.iml
+
+# Force inclusion of everything under Libraries (including binaries)
+!Libraries/**
