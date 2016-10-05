@@ -43,7 +43,7 @@ bool compileShader(GLuint shaderId, const std::string& shaderFileName)
 	int infoLogLength = 0;
 	glGetShaderiv(shaderId, GL_COMPILE_STATUS, &result);
 	glGetShaderiv(shaderId, GL_INFO_LOG_LENGTH, &infoLogLength);
-	if (infoLogLength > 0)
+	if (infoLogLength > 1)
 	{
 		// Display the compilation log
 		std::vector<char> errorMessage(infoLogLength + 1);
@@ -74,7 +74,7 @@ GLuint loadShaders(const std::string& vertex_file_path, const std::string& fragm
 	int infoLogLength = 0;
 	glGetProgramiv(programId, GL_LINK_STATUS, &result);
 	glGetProgramiv(programId, GL_INFO_LOG_LENGTH, &infoLogLength);
-	if (infoLogLength > 0) {
+	if (infoLogLength > 1) {
 		std::vector<char> errorMessage(infoLogLength + 1);
 		glGetProgramInfoLog(programId, infoLogLength, NULL, errorMessage.data());
 		showErrorMessage(errorMessage.data(), "glLinkProgram error");
@@ -145,6 +145,11 @@ int main(int argc, char* args[])
 
 	GLuint programID = loadShaders("vertex.glsl", "fragment.glsl");
 
+	GLuint myColourLocation = glGetUniformLocation(programID, "myColour");
+	GLuint timeLocation = glGetUniformLocation(programID, "time");
+
+	float red = 1, green = 0, blue = 0;
+
 	bool running = true;
 	while (running)
 	{
@@ -163,6 +168,14 @@ int main(int argc, char* args[])
 				case SDLK_ESCAPE:
 					running = false;
 					break;
+
+				case SDLK_r:
+					red = 1; green = 0; blue = 0;
+					break;
+
+				case SDLK_y:
+					red = 1; green = 1; blue = 0;
+					break;
 				}
 			}
 		}
@@ -171,6 +184,9 @@ int main(int argc, char* args[])
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		glUseProgram(programID);
+
+		glUniform3f(myColourLocation, red, green, blue);
+		glUniform1f(timeLocation, SDL_GetTicks() / 1000.0f);
 
 		// 1rst attribute buffer : vertices
 		glEnableVertexAttribArray(0);
