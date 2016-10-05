@@ -253,5 +253,7 @@ paket-files/
 .idea/
 *.sln.iml
 
+.DS_Store
+
 # Force inclusion of everything under Libraries (including binaries)
 !Libraries/**
