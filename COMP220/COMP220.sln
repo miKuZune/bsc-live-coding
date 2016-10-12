@@ -7,6 +7,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "01_FirstOpenGL", "01_FirstO
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "03_Transformations", "03_Transformations\03_Transformations.vcxproj", "{C59BE2B5-262F-4714-8BF0-C5A6CBFFDA81}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "04_Cube", "04_Cube\04_Cube.vcxproj", "{6529C447-9352-417D-A20C-FD5E5DCF5E7F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -31,6 +33,14 @@ Global
 		{C59BE2B5-262F-4714-8BF0-C5A6CBFFDA81}.Release|x64.Build.0 = Release|x64
 		{C59BE2B5-262F-4714-8BF0-C5A6CBFFDA81}.Release|x86.ActiveCfg = Release|Win32
 		{C59BE2B5-262F-4714-8BF0-C5A6CBFFDA81}.Release|x86.Build.0 = Release|Win32
+		{6529C447-9352-417D-A20C-FD5E5DCF5E7F}.Debug|x64.ActiveCfg = Debug|x64
+		{6529C447-9352-417D-A20C-FD5E5DCF5E7F}.Debug|x64.Build.0 = Debug|x64
+		{6529C447-9352-417D-A20C-FD5E5DCF5E7F}.Debug|x86.ActiveCfg = Debug|Win32
+		{6529C447-9352-417D-A20C-FD5E5DCF5E7F}.Debug|x86.Build.0 = Debug|Win32
+		{6529C447-9352-417D-A20C-FD5E5DCF5E7F}.Release|x64.ActiveCfg = Release|x64
+		{6529C447-9352-417D-A20C-FD5E5DCF5E7F}.Release|x64.Build.0 = Release|x64
+		{6529C447-9352-417D-A20C-FD5E5DCF5E7F}.Release|x86.ActiveCfg = Release|Win32
+		{6529C447-9352-417D-A20C-FD5E5DCF5E7F}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
