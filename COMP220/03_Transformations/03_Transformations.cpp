@@ -156,7 +156,12 @@ int main(int argc, char* args[])
 
 	GLuint programID = loadShaders("vertex.glsl", "fragment.glsl");
 
-	GLuint transformLocation = glGetUniformLocation(programID, "transform");
+	GLuint mvpLocation = glGetUniformLocation(programID, "mvp");
+
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LESS);
+
+	glm::vec3 eyePosition(0, 0, 10);
 
 	bool running = true;
 	while (running)
@@ -176,12 +181,31 @@ int main(int argc, char* args[])
 				case SDLK_ESCAPE:
 					running = false;
 					break;
+
+				case SDLK_LEFT:
+					eyePosition.x -= 1;
+					break;
+
+				case SDLK_RIGHT:
+					eyePosition.x += 1;
+					break;
+
+				case SDLK_UP:
+					eyePosition.z -= 1;
+					break;
+
+				case SDLK_DOWN:
+					eyePosition.z += 1;
+					break;
 				}
 			}
 		}
 
+		int mouseX, mouseY;
+		SDL_GetMouseState(&mouseX, &mouseY);
+
 		glClearColor(0.0f, 0.5f, 1.0f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		glUseProgram(programID);
 
@@ -209,14 +233,29 @@ int main(int argc, char* args[])
 			(void*)0                          // array buffer offset
 			);
 
+		glm::mat4 view = glm::lookAt(eyePosition, eyePosition + glm::vec3(0, 0, -1), glm::vec3(0, 1, 0));
+		glm::mat4 projection = glm::perspective(glm::radians(45.0f), 1.0f, 0.1f, 100.0f);
+
 		// Draw the triangle !
 		glm::mat4 transform;
-		glUniformMatrix4fv(transformLocation, 1, GL_FALSE, glm::value_ptr(transform));
+		glm::mat4 mvp = projection * view * transform;
+		glUniformMatrix4fv(mvpLocation, 1, GL_FALSE, glm::value_ptr(mvp));
 		glDrawArrays(GL_TRIANGLES, 0, 3); // Starting from vertex 0; 3 vertices total -> 1 triangle
 
-		// Do something with transform here
-		glUniformMatrix4fv(transformLocation, 1, GL_FALSE, glm::value_ptr(transform));
-		glDrawArrays(GL_TRIANGLES, 0, 3); // Starting from vertex 0; 3 vertices total -> 1 triangle
+		//transform = glm::translate(transform, glm::vec3(0.5f, 0.5f, 0));
+		transform = glm::rotate(transform, SDL_GetTicks() / 1000.0f, glm::vec3(0, 1, 0));
+		//transform = glm::scale(transform, glm::vec3(0.5f));
+		//transform = glm::translate(transform, glm::vec3(0, -0.5f, 0));
+
+		for (int i = 1; i < 1000; i++)
+		{
+			transform = glm::mat4();
+			transform = glm::translate(transform, glm::vec3(-i * 0.02f * mouseX * 0.01f, -mouseY * 0.01f + 1, 0));
+			transform = glm::rotate(transform, SDL_GetTicks() / 100000.0f * i, glm::vec3(0, 1, 0));
+			mvp = projection * view * transform;
+			glUniformMatrix4fv(mvpLocation, 1, GL_FALSE, glm::value_ptr(mvp));
+			glDrawArrays(GL_TRIANGLES, 0, 3); // Starting from vertex 0; 3 vertices total -> 1 triangle
+		}
 
 		glDisableVertexAttribArray(0);
 		glDisableVertexAttribArray(1);
