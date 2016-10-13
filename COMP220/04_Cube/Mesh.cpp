@@ -31,6 +31,13 @@ void Mesh::addTriangle(const glm::vec3& p1, const glm::vec3& p2, const glm::vec3
 		m_vertexColours.push_back(colour);
 }
 
+void Mesh::addSquare(const glm::vec3& a, const glm::vec3& b,
+	const glm::vec3& c, const glm::vec3& d, const glm::vec3& colour)
+{
+	addTriangle(a, b, d, colour);
+	addTriangle(d, b, c, colour);
+}
+
 void Mesh::createBuffers()
 {
 	if (m_positionBuffer != 0)

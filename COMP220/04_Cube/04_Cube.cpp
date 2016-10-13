@@ -129,7 +129,21 @@ int main(int argc, char* args[])
 	glBindVertexArray(VertexArrayID);
 
 	Mesh mesh;
-	mesh.addTriangle(glm::vec3(-1, -1, 0), glm::vec3(1, -1, 0), glm::vec3(0, 1, 0), glm::vec3(1, 1, 0));
+	glm::vec3 a(-1, +1, +1);
+	glm::vec3 b(+1, +1, +1);
+	glm::vec3 c(+1, +1, -1);
+	glm::vec3 d(-1, +1, -1);
+	glm::vec3 e(-1, -1, +1);
+	glm::vec3 f(-1, -1, -1);
+	glm::vec3 g(+1, -1, -1);
+	glm::vec3 h(+1, -1, +1);
+
+	mesh.addSquare(a, b, c, d, glm::vec3(1, 0, 0));
+	mesh.addSquare(b, h, g, c, glm::vec3(1, 1, 0));
+	mesh.addSquare(a, e, h, b, glm::vec3(0, 1, 0));
+	mesh.addSquare(d, f, e, a, glm::vec3(0, 0, 1));
+	mesh.addSquare(e, f, g, h, glm::vec3(1, 0.5f, 0));
+	mesh.addSquare(d, c, g, f, glm::vec3(1, 0, 1));
 	mesh.createBuffers();
 
 	GLuint programID = loadShaders("vertex.glsl", "fragment.glsl");
@@ -138,6 +152,15 @@ int main(int argc, char* args[])
 
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
+
+	//glEnable(GL_CULL_FACE);
+
+	glm::vec4 playerPosition(0, 0, 5, 1);
+	float playerPitch = 0;
+	float playerYaw = 0;
+
+	SDL_SetRelativeMouseMode(SDL_TRUE);
+	SDL_GetRelativeMouseState(nullptr, nullptr);
 
 	bool running = true;
 	while (running)
@@ -161,17 +184,61 @@ int main(int argc, char* args[])
 			}
 		}
 
+		int mouseX, mouseY;
+		SDL_GetRelativeMouseState(&mouseX, &mouseY);
+		playerYaw -= mouseX * 0.005f;
+		playerPitch -= mouseY * 0.005f;
+		const float maxPitch = glm::radians(89.0f);
+		if (playerPitch > maxPitch)
+			playerPitch = maxPitch;
+		if (playerPitch < -maxPitch)
+			playerPitch = -maxPitch;
+
+		glm::vec4 playerLook(0, 0, -1, 0);
+		glm::mat4 playerRotation;
+		playerRotation = glm::rotate(playerRotation, playerYaw, glm::vec3(0, 1, 0));
+		playerRotation = glm::rotate(playerRotation, playerPitch, glm::vec3(1, 0, 0));
+		playerLook = playerRotation * playerLook;
+
+		glm::vec4 playerForward(0, 0, -1, 0);
+		glm::mat4 playerForwardRotation;
+		playerForwardRotation = glm::rotate(playerForwardRotation, playerYaw, glm::vec3(0, 1, 0));
+		playerForward = playerForwardRotation * playerForward;
+
+		const Uint8* keyboardState = SDL_GetKeyboardState(nullptr);
+		if (keyboardState[SDL_SCANCODE_W])
+		{
+			playerPosition += playerForward * 0.001f;
+		}
+		if (keyboardState[SDL_SCANCODE_S])
+		{
+			playerPosition -= playerForward * 0.001f;
+		}
+
+		glm::vec4 playerRight(0, 0, -1, 0);
+		glm::mat4 playerRightRotation;
+		playerRightRotation = glm::rotate(playerRightRotation, playerYaw - glm::radians(90.0f), glm::vec3(0, 1, 0));
+		playerRight = playerRightRotation * playerRight;
+
+		if (keyboardState[SDL_SCANCODE_A])
+		{
+			playerPosition -= playerRight * 0.001f;
+		}
+		if (keyboardState[SDL_SCANCODE_D])
+		{
+			playerPosition += playerRight * 0.001f;
+		}
+
 		glClearColor(0.0f, 0.5f, 1.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		glUseProgram(programID);
 
-		glm::mat4 view = glm::lookAt(glm::vec3(0, 5, 5), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
+		glm::mat4 view = glm::lookAt(glm::vec3(playerPosition), glm::vec3(playerPosition + playerLook), glm::vec3(0, 1, 0));
 		glm::mat4 projection = glm::perspective(glm::radians(45.0f), 1.0f, 0.1f, 100.0f);
 
-		// Draw the triangle !
 		glm::mat4 transform;
-		transform = glm::rotate(transform, SDL_GetTicks() / 1000.0f, glm::vec3(0, 1, 0));
+		//transform = glm::rotate(transform, SDL_GetTicks() / 1000.0f, glm::vec3(0, 1, 0));
 		glm::mat4 mvp = projection * view * transform;
 		glUniformMatrix4fv(mvpLocation, 1, GL_FALSE, glm::value_ptr(mvp));
 
