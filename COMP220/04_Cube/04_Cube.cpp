@@ -94,7 +94,7 @@ int main(int argc, char* args[])
 {
 	if (SDL_Init(SDL_INIT_VIDEO) < 0)
 	{
-		showErrorMessage("SDL_Init failed", SDL_GetError());
+		showErrorMessage(SDL_GetError(), "SDL_Init failed");
 		return 1;
 	}
 
@@ -107,7 +107,7 @@ int main(int argc, char* args[])
 
 	if (window == nullptr)
 	{
-		showErrorMessage("SDL_CreateWindow failed", SDL_GetError());
+		showErrorMessage(SDL_GetError(), "SDL_CreateWindow failed");
 		return 1;
 	}
 
@@ -115,7 +115,7 @@ int main(int argc, char* args[])
 
 	if (glContext == nullptr)
 	{
-		showErrorMessage("SDL_GL_CreateContext failed", SDL_GetError());
+		showErrorMessage(SDL_GetError(), "SDL_GL_CreateContext failed");
 		return 1;
 	}
 
@@ -200,10 +200,11 @@ int main(int argc, char* args[])
 		playerRotation = glm::rotate(playerRotation, playerPitch, glm::vec3(1, 0, 0));
 		playerLook = playerRotation * playerLook;
 
-		glm::vec4 playerForward(0, 0, -1, 0);
+		/*glm::vec4 playerForward(0, 0, -1, 0);
 		glm::mat4 playerForwardRotation;
 		playerForwardRotation = glm::rotate(playerForwardRotation, playerYaw, glm::vec3(0, 1, 0));
-		playerForward = playerForwardRotation * playerForward;
+		playerForward = playerForwardRotation * playerForward;*/
+		glm::vec4 playerForward = playerLook;
 
 		const Uint8* keyboardState = SDL_GetKeyboardState(nullptr);
 		if (keyboardState[SDL_SCANCODE_W])
