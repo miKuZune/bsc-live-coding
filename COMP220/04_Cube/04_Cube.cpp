@@ -90,6 +90,44 @@ GLuint loadShaders(const std::string& vertex_file_path, const std::string& fragm
 	return programId;
 }
 
+GLuint loadTexture(const std::string& fileName)
+{
+	SDL_Surface* textureSurface = IMG_Load(fileName.c_str());
+
+	if (textureSurface == nullptr)
+	{
+		showErrorMessage(SDL_GetError(), "IMG_Load failed");
+		return 0;
+	}
+
+	GLuint textureId;
+	glGenTextures(1, &textureId);
+	glBindTexture(GL_TEXTURE_2D, textureId);
+
+	int format;
+	if (textureSurface->format->BytesPerPixel == 3)
+	{
+		format = GL_RGB;
+	}
+	else if (textureSurface->format->BytesPerPixel == 4)
+	{
+		format = GL_RGBA;
+	}
+	else
+	{
+		showErrorMessage("Invalid pixel format", ":(");
+		return 0;
+	}
+
+	glTexImage2D(GL_TEXTURE_2D, 0, format, textureSurface->w, textureSurface->h, 0, format, GL_UNSIGNED_BYTE, textureSurface->pixels);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+	SDL_FreeSurface(textureSurface);
+	return textureId;
+}
+
 int main(int argc, char* args[])
 {
 	if (SDL_Init(SDL_INIT_VIDEO) < 0)
@@ -122,6 +160,15 @@ int main(int argc, char* args[])
 	if (glewInit() != GLEW_OK)
 	{
 		showErrorMessage("glewInit failed", ":(");
+		return 1;
+	}
+
+	GLuint diceTexture = loadTexture("dice_texture_2.png");
+
+	if (diceTexture == 0)
+	{
+		showErrorMessage("loadTexture failed", ":(");
+		return 1;
 	}
 
 	GLuint VertexArrayID;
@@ -138,12 +185,14 @@ int main(int argc, char* args[])
 	glm::vec3 g(+1, -1, -1);
 	glm::vec3 h(+1, -1, +1);
 
-	mesh.addSquare(a, b, c, d, glm::vec3(1, 0, 0));
-	mesh.addSquare(b, h, g, c, glm::vec3(1, 1, 0));
-	mesh.addSquare(a, e, h, b, glm::vec3(0, 1, 0));
-	mesh.addSquare(d, f, e, a, glm::vec3(0, 0, 1));
-	mesh.addSquare(e, f, g, h, glm::vec3(1, 0.5f, 0));
-	mesh.addSquare(d, c, g, f, glm::vec3(1, 0, 1));
+	/*mesh.addSquare(a, b, c, d, glm::vec3(1, 0, 0), 0.25f, 0.5f, 0.0f, 0.25f);
+	mesh.addSquare(b, h, g, c, glm::vec3(1, 1, 0), 0.5f, 0.75f, 0.25f, 0.5f);
+	mesh.addSquare(a, e, h, b, glm::vec3(0, 1, 0), 0.25f, 0.5f, 0.25f, 0.5f);
+	mesh.addSquare(d, f, e, a, glm::vec3(0, 0, 1), 0.75f, 1.0f, 0.25f, 0.5f);
+	mesh.addSquare(e, f, g, h, glm::vec3(1, 0.5f, 0), 0.0f, 0.25f, 0.25f, 0.5f);
+	mesh.addSquare(d, c, g, f, glm::vec3(1, 0, 1), 0.25f, 0.5f, 0.5f, 0.75f);*/
+
+	mesh.addCircle(glm::vec3(0, -2, 0), 1, 500, glm::vec3(1, 1, 0));
 	mesh.createBuffers();
 
 	GLuint programID = loadShaders("vertex.glsl", "fragment.glsl");
@@ -152,6 +201,9 @@ int main(int argc, char* args[])
 
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
+
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	//glEnable(GL_CULL_FACE);
 

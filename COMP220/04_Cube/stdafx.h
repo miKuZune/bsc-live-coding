@@ -26,6 +26,7 @@
 
 // SDL
 #include <SDL.h>
+#include <SDL_image.h>
 
 // OpenGL
 #include <GL/glew.h>
