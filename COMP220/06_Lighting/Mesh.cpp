@@ -59,7 +59,6 @@ void Mesh::addSphere(float radius, int quality, const glm::vec3& colour)
 	std::vector<Vertex> lastRingPoints, ringPoints;
 	
 	// Top cap
-	Vertex pole = createSphereVertex(radius, 0.0f, glm::radians(90.0f), colour);
 	float latitude = angleStep * (quality - 1);
 	for (int i = 0; i <= quality * 4; i++)
 	{
@@ -67,6 +66,7 @@ void Mesh::addSphere(float radius, int quality, const glm::vec3& colour)
 		ringPoints.push_back(createSphereVertex(radius, longitude, latitude, colour));
 		if (ringPoints.size() > 1)
 		{
+			Vertex pole = createSphereVertex(radius, longitude - 0.5f*angleStep, glm::radians(90.0f), colour);
 			addTriangle(pole, ringPoints[i], ringPoints[i - 1]);
 		}
 	}
@@ -91,9 +91,9 @@ void Mesh::addSphere(float radius, int quality, const glm::vec3& colour)
 	}
 
 	// Bottom cap
-	pole = createSphereVertex(radius, 0.0f, glm::radians(-90.0f), colour);
 	for (int i = 1; i < ringPoints.size(); i++)
 	{
+		Vertex pole = createSphereVertex(radius, (i - 0.5f)*angleStep, glm::radians(-90.0f), colour);
 		addTriangle(pole, ringPoints[i - 1], ringPoints[i]);
 	}
 }
