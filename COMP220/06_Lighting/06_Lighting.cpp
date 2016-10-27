@@ -176,12 +176,14 @@ int main(int argc, char* args[])
 	glBindVertexArray(VertexArrayID);
 
 	Mesh mesh;
-	mesh.addSphere(1, 8, glm::vec4(1, 1, 1, 1));
+	mesh.addSphere(1, 16, glm::vec4(1, 1, 1, 1));
 	mesh.createBuffers();
 
 	GLuint programID = loadShaders("vertex.glsl", "fragment.glsl");
 
 	GLuint mvpLocation = glGetUniformLocation(programID, "mvp");
+
+	GLuint lightDirectionLocation = glGetUniformLocation(programID, "lightDirection");
 
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
@@ -278,6 +280,8 @@ int main(int argc, char* args[])
 		//transform = glm::rotate(transform, SDL_GetTicks() / 1000.0f, glm::vec3(0, 1, 0));
 		glm::mat4 mvp = projection * view * transform;
 		glUniformMatrix4fv(mvpLocation, 1, GL_FALSE, glm::value_ptr(mvp));
+
+		glUniform3f(lightDirectionLocation, 1, 1, 1);
 
 		mesh.draw();
 

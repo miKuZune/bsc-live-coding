@@ -15,10 +15,20 @@ Mesh::~Mesh()
 
 	if (m_uvBuffer != 0)
 		glDeleteBuffers(1, &m_uvBuffer);
+
+	if (m_normalBuffer != 0)
+		glDeleteBuffers(1, &m_normalBuffer);
 }
 
-void Mesh::addTriangle(const Vertex& v1, const Vertex& v2, const Vertex& v3)
+void Mesh::addTriangle(Vertex v1, Vertex v2, Vertex v3)
 {
+	glm::vec3 normal = glm::cross(v2.m_position - v1.m_position, v3.m_position - v1.m_position);
+	normal = glm::normalize(normal);
+
+	v1.m_normal = normal;
+	v2.m_normal = normal;
+	v3.m_normal = normal;
+
 	addVertex(v1);
 	addVertex(v2);
 	addVertex(v3);
@@ -34,6 +44,7 @@ void Mesh::addVertex(const Vertex& vertex)
 	m_vertexPositions.push_back(vertex.m_position);
 	m_vertexColours.push_back(vertex.m_colour);
 	m_vertexUVs.push_back(vertex.m_textureCoord);
+	m_vertexNormals.push_back(vertex.m_normal);
 }
 
 Vertex Mesh::createSphereVertex(float radius, float longitude, float latitude, const glm::vec3& colour)
@@ -119,6 +130,11 @@ void Mesh::createBuffers()
 	glGenBuffers(1, &m_uvBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, m_uvBuffer);
 	glBufferData(GL_ARRAY_BUFFER, m_vertexUVs.size() * sizeof(glm::vec2), m_vertexUVs.data(), GL_STATIC_DRAW);
+
+	// Create and fill the normal buffer
+	glGenBuffers(1, &m_normalBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, m_normalBuffer);
+	glBufferData(GL_ARRAY_BUFFER, m_vertexNormals.size() * sizeof(glm::vec3), m_vertexNormals.data(), GL_STATIC_DRAW);
 }
 
 void Mesh::draw()
@@ -143,9 +159,15 @@ void Mesh::draw()
 	glBindBuffer(GL_ARRAY_BUFFER, m_uvBuffer);
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
 
+	// Bind the normal buffer to vertex attribute 3
+	glEnableVertexAttribArray(3);
+	glBindBuffer(GL_ARRAY_BUFFER, m_normalBuffer);
+	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+
 	glDrawArrays(GL_TRIANGLES, 0, m_vertexPositions.size());
 
 	glDisableVertexAttribArray(0);
 	glDisableVertexAttribArray(1);
 	glDisableVertexAttribArray(2);
+	glDisableVertexAttribArray(3);
 }
