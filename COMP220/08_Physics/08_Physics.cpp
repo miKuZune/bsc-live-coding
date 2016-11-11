@@ -4,6 +4,7 @@
 #include "stdafx.h"
 #include "08_Physics.h"
 #include "Mesh.h"
+#include "Ball.h"
 
 // NOTE: this code is intended to illustrate usage of OpenGL.
 // It is NOT intended to illustrate good coding style or naming conventions!
@@ -181,6 +182,8 @@ int main(int argc, char* args[])
 	ballMesh.addSphere(ballRadius, 8, glm::vec4(1, 1, 1, 1));
 	ballMesh.createBuffers();
 
+	Ball ball(glm::vec3(0, 0, 0), glm::vec3(0, 0, 0));
+
 	const float floorY = -5;
 	const float floorSize = 10;
 	Vertex floorVertices[] = {
@@ -214,6 +217,8 @@ int main(int argc, char* args[])
 
 	SDL_SetRelativeMouseMode(SDL_TRUE);
 	SDL_GetRelativeMouseState(nullptr, nullptr);
+
+	Uint32 lastFrameTime = SDL_GetTicks();
 
 	bool running = true;
 	while (running)
@@ -283,6 +288,14 @@ int main(int argc, char* args[])
 			playerPosition += playerRight * 0.001f;
 		}
 
+		// Calculate delta time
+		Uint32 currentTime = SDL_GetTicks();
+		float deltaTime = (currentTime - lastFrameTime) / 1000.0f;
+		lastFrameTime = currentTime;
+
+		// Update physics
+		ball.tick(deltaTime, floorY);
+
 		glClearColor(0.0f, 0.0f, 0.2f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -293,13 +306,19 @@ int main(int argc, char* args[])
 
 		glm::mat4 transform;
 		//transform = glm::rotate(transform, SDL_GetTicks() / 1000.0f, glm::vec3(0, 1, 0));
-		glm::mat4 mvp = projection * view * transform;
-		glUniformMatrix4fv(mvpLocation, 1, GL_FALSE, glm::value_ptr(mvp));
 
 		glUniform3f(lightDirectionLocation, 1, 1, 1);
 
+		transform = glm::translate(transform, ball.getPosition());
+		glm::mat4 mvp = projection * view * transform;
+		glUniformMatrix4fv(mvpLocation, 1, GL_FALSE, glm::value_ptr(mvp));
+
 		glBindTexture(GL_TEXTURE_2D, ballTexture);
 		ballMesh.draw();
+
+		transform = glm::mat4(); // identity
+		mvp = projection * view * transform;
+		glUniformMatrix4fv(mvpLocation, 1, GL_FALSE, glm::value_ptr(mvp));
 
 		glBindTexture(GL_TEXTURE_2D, floorTexture);
 		floorMesh.draw();
