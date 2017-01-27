@@ -257,3 +257,7 @@ paket-files/
 
 # Force inclusion of everything under Libraries (including binaries)
 !Libraries/**
+
+# Compiled Python files
+*.pyc
+*.pyo
