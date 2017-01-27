@@ -71,7 +71,8 @@ while running:
                 if not check_game_over():
                     # Have the AI player play a move
                     opponent_x, opponent_y = ai_player.choose_move(game_board)
-                    game_board.set_square(opponent_x, opponent_y, 2)
+                    if not game_board.set_square(opponent_x, opponent_y, 2):
+                        raise RuntimeError("AI player chose an invalid move (%i, %i)" % (opponent_x, opponent_y))
                     check_game_over()
 
     # Clear the screen
