@@ -2,6 +2,12 @@ class Board:
     def __init__(self):
         self.board = [0]*9
 
+    def clone(self):
+        """ Return a copy of this board """
+        copy = Board()
+        copy.board = self.board[:]
+        return copy
+
     def get_square(self, x, y):
         """ Return 0, 1 or 2 depending on the contents of the specified square.
             0 = empty, 1 = noughts, 2 = crosses. """
@@ -19,6 +25,12 @@ class Board:
             return True
         else:
             return False
+
+    def unset_square(self, x, y):
+        """ Remove the mark in the specified square. """
+        if 0 <= x < 3 and 0 <= y < 3:
+            i = y * 3 + x
+            self.board[i] = 0
 
     def is_board_full(self):
         """ If there are still empty squares on the board, return False.
