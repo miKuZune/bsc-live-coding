@@ -21,7 +21,7 @@ def manhattan_distance((x1, y1), (x2, y2)):
 
 
 def max_component_distance((x1, y1), (x2, y2)):
-    return max(abs(x2-x1), abs(y2-y1))
+    return min(abs(x2-x1), abs(y2-y1))
 
 
 class Node:
