@@ -75,10 +75,10 @@ class Board:
 
     def get_game_result(self, player):
         """ If this is a terminal state, return its value for the given player:
-            1 for a win, 0 for a loss, 0.5 for a draw.
+            +1 for a win, -1 for a loss, 0 for a draw.
             If this is a nonterminal state, return None. """
         if self.is_board_full():
-            return 0.5
+            return 0
 
         for y in xrange(HEIGHT):
             for x in xrange(WIDTH):
@@ -87,9 +87,9 @@ class Board:
                     if winner is not None:
                         self.winning_line = (x, y, dx, dy)
                         if winner == player:
-                            return 1.0
+                            return 1
                         else:
-                            return 0.0
+                            return -1
 
         return None
 

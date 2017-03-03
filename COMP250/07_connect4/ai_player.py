@@ -17,7 +17,7 @@ def minimax(board):
                 board.unplay_move(move)
                 if board.current_player == 1:
                     best_value = min(value, best_value)
-                    if best_value == 0:
+                    if best_value == -1:
                         return best_value
                 else:
                     best_value = max(value, best_value)

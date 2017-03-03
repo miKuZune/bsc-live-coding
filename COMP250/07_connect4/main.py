@@ -58,7 +58,7 @@ def main():
         if result is not None:
             game_over = True # Causes us to break out of the main loop
 
-            if result == 0.5:
+            if result == 0:
                 game_over_text = "It's a draw!"
             elif result == 1:
                 game_over_text = "Human wins!"
