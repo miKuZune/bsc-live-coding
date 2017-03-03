@@ -1,6 +1,7 @@
 import pygame
 
 import board
+import ai_player
 
 
 def main():
@@ -24,17 +25,34 @@ def main():
         screen.fill((255, 255, 255))
         the_board.draw(screen)
         pygame.display.flip()
-
-        # Handle events
-        event = pygame.event.wait()
-        if event.type == pygame.QUIT:
-            raise KeyboardInterrupt()
-        elif event.type == pygame.MOUSEBUTTONDOWN:
-            mouse_x, mouse_y = event.pos
-            square_x = mouse_x / board.TILE_SIZE
-            if not the_board.play_move(square_x):
-                print "Illegal move"
-
+        
+        if the_board.current_player == 1:
+            # Handle events, waiting for player to play a move
+            played_move = False
+            while not played_move:
+                event = pygame.event.wait()
+                if event.type == pygame.QUIT:
+                    raise KeyboardInterrupt()
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    mouse_x, mouse_y = event.pos
+                    square_x = mouse_x / board.TILE_SIZE
+                    if the_board.play_move(square_x):
+                        played_move = True
+                    else:
+                        print "Illegal move"
+        else:
+            # Draw text in the centre of the screen
+            font = pygame.font.Font(None, 60)
+            text_surface = font.render("I'm thinking...", True, (0, 0, 0))
+            x = (window_width - text_surface.get_width()) * 0.5
+            y = (window_height - text_surface.get_height()) * 0.5
+            screen.blit(text_surface, (x, y))
+            pygame.display.flip()
+            
+            # Let the AI play a move
+            move = ai_player.choose_move(the_board)
+            the_board.play_move(move)
+        
         # Check if game is over
         result = the_board.get_game_result(1)
         if result is not None:

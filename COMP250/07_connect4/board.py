@@ -43,6 +43,16 @@ class Board:
                 self.current_player = 3 - self.current_player # Flip current player
                 return True
         return False
+    
+    def unplay_move(self, x):
+        """ Remove the top counter from column x, and flip the current player. """
+        for y in xrange(HEIGHT): # top to bottom, to find the first occupied space
+            i = y * WIDTH + x
+            if self.squares[i] != 0:
+                self.squares[i] = 0
+                self.current_player = 3 - self.current_player # Flip current player
+                return True
+        return False
 
     def is_board_full(self):
         """ Return True if the board is completely full, False otherwise """
