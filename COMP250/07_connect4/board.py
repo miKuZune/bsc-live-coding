@@ -43,6 +43,16 @@ class Board:
                 self.current_player = 3 - self.current_player # Flip current player
                 return True
         return False
+    
+    def unplay_move(self, x):
+        """ Remove the top counter from column x, and flip the current player. """
+        for y in xrange(HEIGHT): # top to bottom, to find the first occupied space
+            i = y * WIDTH + x
+            if self.squares[i] != 0:
+                self.squares[i] = 0
+                self.current_player = 3 - self.current_player # Flip current player
+                return True
+        return False
 
     def is_board_full(self):
         """ Return True if the board is completely full, False otherwise """
@@ -65,10 +75,10 @@ class Board:
 
     def get_game_result(self, player):
         """ If this is a terminal state, return its value for the given player:
-            1 for a win, 0 for a loss, 0.5 for a draw.
+            +1 for a win, -1 for a loss, 0 for a draw.
             If this is a nonterminal state, return None. """
         if self.is_board_full():
-            return 0.5
+            return 0
 
         for y in xrange(HEIGHT):
             for x in xrange(WIDTH):
@@ -77,9 +87,9 @@ class Board:
                     if winner is not None:
                         self.winning_line = (x, y, dx, dy)
                         if winner == player:
-                            return 1.0
+                            return 1
                         else:
-                            return 0.0
+                            return -1
 
         return None
 
