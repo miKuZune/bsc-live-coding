@@ -19,6 +19,16 @@ def wait_key():
             return
 
 
+def draw_map_and_path(screen, the_map, path):
+    screen.fill((255, 255, 255))
+
+    the_map.draw(screen)
+    for i in xrange(1, len(path)):
+        pygame.draw.line(screen, (0, 0, 0), path[i - 1].pos, path[i].pos, 6)
+
+    pygame.display.flip()
+
+
 def main():
     tiles = [' '] * (MAP_WIDTH * MAP_HEIGHT)
     tiles[0] = 'S'
@@ -44,19 +54,9 @@ def main():
     pathfinding.pull_string(the_map, path)
 
     print "Path length:", pathfinding.get_path_length(path)
+    draw_map_and_path(screen, the_map, path)
 
-    screen.fill((255, 255, 255))
-
-    the_map.draw(screen)
-    for i in xrange(1, len(path)):
-        pygame.draw.line(screen, (0, 0, 0), path[i - 1].pos, path[i].pos, 6)
-
-    pygame.display.flip()
-
-    try:
-        wait_key()
-    except KeyboardInterrupt:
-        pass
+    wait_key()
 
 if __name__ == '__main__':
     main()
