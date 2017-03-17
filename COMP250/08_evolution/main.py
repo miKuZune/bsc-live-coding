@@ -5,7 +5,7 @@ import map
 import pathfinding
 
 
-TILE_SIZE = 30
+TILE_SIZE = 25
 MAP_WIDTH = 20
 MAP_HEIGHT = 20
 
@@ -29,12 +29,28 @@ def draw_map_and_path(screen, the_map, path):
     pygame.display.flip()
 
 
+def get_path(the_map):
+    path = pathfinding.a_star_search(the_map, None)
+    if path is None:
+        path = []
+
+    pathfinding.pull_string(the_map, path)
+
+    return path
+
+
+def calculate_fitness(the_map):
+    path = get_path(the_map)
+    return pathfinding.get_path_length(path)
+
+
 def main():
     tiles = [' '] * (MAP_WIDTH * MAP_HEIGHT)
     tiles[0] = 'S'
     tiles[-1] = 'G'
 
     the_map = map.Map((MAP_WIDTH, MAP_HEIGHT), tiles, TILE_SIZE, include_diagonals=True)
+    current_fitness = calculate_fitness(the_map)
 
     # Initialise PyGame
     pygame.init()
@@ -47,16 +63,31 @@ def main():
     # Create the screen
     screen = pygame.display.set_mode(window_size)
 
-    path = pathfinding.a_star_search(the_map, screen)
-    if path is None:
-        path = []
+    index = 0
 
-    pathfinding.pull_string(the_map, path)
+    while True:
+        index += 1
+        if index >= len(tiles):
+            index = 0
 
-    print "Path length:", pathfinding.get_path_length(path)
-    draw_map_and_path(screen, the_map, path)
+        the_map = map.Map((MAP_WIDTH, MAP_HEIGHT), tiles, TILE_SIZE, include_diagonals=True)
+        print "Current fitness:", current_fitness
+        path = get_path(the_map)
+        draw_map_and_path(screen, the_map, path)
 
-    wait_key()
+        new_tiles = tiles[:]
+        #index = random.randrange(len(new_tiles))
+        if new_tiles[index] == ' ':
+            new_tiles[index] = '*'
+
+            new_map = map.Map((MAP_WIDTH, MAP_HEIGHT), new_tiles, TILE_SIZE, include_diagonals=True)
+            new_fitness = calculate_fitness(new_map)
+
+            if new_fitness > current_fitness:
+                tiles = new_tiles
+                current_fitness = new_fitness
+
+        # wait_key()
 
 if __name__ == '__main__':
     main()
