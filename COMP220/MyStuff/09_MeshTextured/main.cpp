@@ -1,7 +1,7 @@
 //main.cpp - defines the entry point of the application
 
 #include "main.h"
-
+ 
 int main(int argc, char* args[])
 {
 	//Initialises the SDL Library, passing in SDL_INIT_VIDEO to only initialise the video subsystems
@@ -43,16 +43,24 @@ int main(int argc, char* args[])
 		return 1;
 	}
 	//Initialize GLEW
+
 	glewExperimental = GL_TRUE;
 	GLenum glewError = glewInit();
 	if (glewError != GLEW_OK)
 	{
 		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, (char*)glewGetErrorString(glewError), "GLEW Init Failed", NULL);
 	}
-
+	/*
 	std::vector<Mesh*> meshes;
 	loadMeshFromFile("Tank1.FBX", meshes);
 	GLuint textureID = loadTextureFromFile("Tank1DF.png");
+	*/
+
+	GameObject * armouredCar = new GameObject();
+	armouredCar->loadMesh("armoredrecon.fbx");
+	armouredCar->loadDiffuseMap("armoredrecon_diff.png");
+	armouredCar->loadShaderProgram("textureVert.glsl", "textureFrag.glsl");
+
 
 	vec3 trianglePosition = vec3(0.0f,0.0f,0.0f);
 	vec3 triangleScale = vec3(1.0f, 1.0f, 1.0f);
@@ -94,6 +102,8 @@ int main(int argc, char* args[])
 	GLint viewMatrixLocation = glGetUniformLocation(programID, "viewMatrix");
 	GLint projectionMatrixLocation = glGetUniformLocation(programID, "projectionMatrix");
 	GLint textureLocation = glGetUniformLocation(programID, "baseTexture");
+
+	armouredCar->update();
 
 	glEnable(GL_DEPTH_TEST);
 	int lastTicks = SDL_GetTicks();
@@ -163,7 +173,7 @@ int main(int argc, char* args[])
 		currentTicks = SDL_GetTicks();
 		float deltaTime = (float)(currentTicks - lastTicks) / 1000.0f;
 
-		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+		/*glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClearDepth(1.0f);
 		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
@@ -183,13 +193,13 @@ int main(int argc, char* args[])
 		for (Mesh *pMesh : meshes)
 		{
 			pMesh->render();
-		}
+		}*/
 		SDL_GL_SwapWindow(window);
 
 		lastTicks = currentTicks;
 	}
 
-	auto iter = meshes.begin();
+	/*auto iter = meshes.begin();
 	while (iter != meshes.end())
 	{
 		if ((*iter))
@@ -206,7 +216,13 @@ int main(int argc, char* args[])
 	meshes.clear();
 	glDeleteTextures(1, &textureID);
 	glDeleteProgram(programID);
+	*/
 
+	if (armouredCar) {
+		armouredCar->destroy();
+		delete armouredCar;
+		armouredCar = nullptr;
+	}
 	SDL_GL_DeleteContext(GL_Context);
 	//Destroy the window and quit SDL2, NB we should do this after all cleanup in this order!!!
 	//https://wiki.libsdl.org/SDL_DestroyWindow
