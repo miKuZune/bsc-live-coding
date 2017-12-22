@@ -2,7 +2,7 @@ COMP220 proposal – The Dragon in the room
 
 The concept: 
 
-For this project I aim to create a playable demo in which the player will be in a room with a dragon, who is breathing fire (https://poly.google.com/view/5Q9iG4srm2k ). The key point will be that the player will be able to walk around the room and interact with objects by picking them up and moving them.  
+For this project I aim to create a playable demo in which the player will be in a room with a dragon, who is breathing fire (https://free3d.com/3d-model/smaug--65285.html). The key point will be that the player will be able to walk around the room and interact with objects by picking them up and moving them.  
 
 These objects should be able to interact with the dragons fire. For example a wooden object would be set on fire or a bomb (https://poly.google.com/view/6_qmrTyXxHa ) object's fuse would light when it comes in contact with the dragon's fire and could explode. 
 

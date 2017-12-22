@@ -17,6 +17,4 @@
 #include "Shader.h"
 #include "Texture.h"
 
-#include "GameObject.h"
-
 using namespace glm;
