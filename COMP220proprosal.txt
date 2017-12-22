@@ -1,0 +1,53 @@
+COMP220 proposal – The Dragon in the room 
+
+The concept: 
+
+For this project I aim to create a playable demo in which the player will be in a room with a dragon, who is breathing fire (https://poly.google.com/view/5Q9iG4srm2k ). The key point will be that the player will be able to walk around the room and interact with objects by picking them up and moving them.  
+
+These objects should be able to interact with the dragons fire. For example a wooden object would be set on fire or a bomb (https://poly.google.com/view/6_qmrTyXxHa ) object's fuse would light when it comes in contact with the dragon's fire and could explode. 
+
+ 
+
+How this satisfies the appendix: 
+
+A scene containing at least one textured mesh and one light source 
+
+This is satisfied by the use of the dragon and the fire that the dragon produces. The dragon itself will be a full textured mesh. As shown In the first image above.  
+
+The fire he will produce will satisfy the one light source requirement as the fire will give off light to the scene. 
+
+Standard first person movement controls 
+
+This project will require the player to move around a 3d world in first person, meaning that standard WASD key controls will be needed as well as the ability to look around at the mouse. The WASD key controls will need to move in accordance of the direction the camera/player is facing.  
+
+Additionally the player will need to be able to pick up objects which will require the use of additionally controls. This will probably be set to be on the "e" key as it is close to the WASD keys.  
+
+This satisfies this part of the appendix as it will use the industry standard WASD controls with mouse movement to look around. This will also satisfy the requirement of extra controls if necessary.  
+
+At least two graphics and simulation techniques 
+
+This demo will use the following techniques: 
+
+Collision detection/ray casting 
+
+Particle effects 
+
+Advanced real time lighting 
+
+I will use the collision detection/ray casting to allow the player to pick up objects which are close enough to them. This technique will also be used to allow objects to interact with the dragon's fire. 
+
+The particle effects will be used to create the fire effect coming from the dragon's mouth. 
+
+The advanced real time lighting will be used to create a moving light source from the dragon's fire. 
+
+Some aspect of fun/engagement 
+
+This will be achieved through the players ability to pick up and set fire to different objects in the room through the dragon's fire. These objects will then have their own characteristics and events that happen when they are set on fire, which the player will be able to activate and observe.  
+
+For example, if they set fire to a bomb object, the fuse will ignite and after some time it will explode. Potentially this could cause other objects to be set on fire or force them to move from their position. 
+
+Links: 
+
+Dragon - https://poly.google.com/view/5Q9iG4srm2k 
+
+Bomb - https://poly.google.com/view/6_qmrTyXxHa 
