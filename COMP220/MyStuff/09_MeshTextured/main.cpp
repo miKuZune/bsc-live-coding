@@ -54,9 +54,9 @@ int main(int argc, char* args[])
 	loadMeshFromFile("smaug.fbx", meshes);
 	GLuint textureID = loadTextureFromFile("skin-t.tga");
 
-	vec3 trianglePosition = vec3(0.0f,0.0f,10.0f);
+	vec3 trianglePosition = vec3(0.0f,-5.0f,10.0f);
 	vec3 triangleScale = vec3(1.0f, 1.0f, 1.0f);
-	vec3 triangleRotation = vec3(140.0f, -2.0f, 0.0f);
+	vec3 triangleRotation = vec3(140.0f, 3.10f, 0.0f);
 
 	
 	mat4 translationMatrix = translate(trianglePosition);
@@ -104,6 +104,15 @@ int main(int argc, char* args[])
 	bool running = true;
 	//SDL Event structure, this will be checked in the while loop
 	SDL_Event ev;
+
+	//Movement vari
+	vec3 newCamPos = cameraPosition;
+	vec3 newCamTarget = cameraTarget;
+	vec3 newCamUp = cameraUp;
+
+	//Model pos
+	vec3 newModelRot = triangleRotation;
+
 	while (running)
 	{
 		//Poll for the events which have happened in this frame
@@ -126,9 +135,37 @@ int main(int argc, char* args[])
 				case SDLK_ESCAPE:
 					running = false;
 					break;
+				case SDLK_w:
+					newCamPos.z += 1;
+					newCamTarget.z += 1;
+					break;
+				case SDLK_s:
+					newCamPos.z -= 1;
+					newCamTarget.z -= 1;
+					break;
+				case SDLK_a:
+					newCamPos.x += 1;
+					newCamTarget.x += 1;
+					break;
+				case SDLK_d:
+					newCamPos.x -= 1;
+					newCamTarget.x -= 1;
+					break;
+				case SDLK_e:
+					newCamTarget.x += 1;
+					break;
+				case SDLK_q:
+					newCamTarget.x -= 1;
+					break;
 				}
 			}
 		}
+
+		//Update camera position and target.
+		viewMatrix = lookAt(newCamPos, newCamTarget, newCamUp);
+		rotationMatrix = rotate(newModelRot.x, vec3(1.0f, 0.0f, 0.0f))*rotate(newModelRot.y, vec3(0.0f, 1.0f, 0.0f))*rotate(newModelRot.z, vec3(0.0f, 0.0f, 1.0f));
+		mat4 modelMatrix = translationMatrix * rotationMatrix*scaleMatrix;
+
 
 		currentTicks = SDL_GetTicks();
 		float deltaTime = (float)(currentTicks - lastTicks) / 1000.0f;

@@ -1,4 +1,4 @@
-Add dragon mesh and texture to the demo
+Add dragon mesh and texture to the demo 						XXX
 
 Add walking with WASD
 
