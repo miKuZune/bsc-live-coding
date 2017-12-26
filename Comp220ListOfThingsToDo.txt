@@ -1,8 +1,8 @@
 Add dragon mesh and texture to the demo 						XXX
 
-Add walking with WASD
+Add walking with WASD          								xxx
 
-Add looking about with the mouse
+Add looking about with the mouse							xxx
 
 Add other objects to the world
 

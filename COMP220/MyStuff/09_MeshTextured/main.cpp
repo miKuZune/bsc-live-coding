@@ -1,6 +1,9 @@
 //main.cpp - defines the entry point of the application
 
 #include "main.h"
+#include <iostream>
+
+using namespace std;
 
 int main(int argc, char* args[])
 {
@@ -16,7 +19,9 @@ int main(int argc, char* args[])
 
 	//Create a window, note we have to free the pointer returned using the DestroyWindow Function
 	//https://wiki.libsdl.org/SDL_CreateWindow
-	SDL_Window* window = SDL_CreateWindow("SDL2 Window", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 800, 600, SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL);
+	int windowWidth = 800, windowHeight = 600;
+
+	SDL_Window* window = SDL_CreateWindow("SDL2 Window", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, windowWidth, windowHeight, SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL);
 	//Checks to see if the window has been created, the pointer will have a value of some kind
 	if (window == nullptr)
 	{
@@ -113,12 +118,37 @@ int main(int argc, char* args[])
 	//Model pos
 	vec3 newModelRot = triangleRotation;
 
+	float mouseX = 0, mouseY = 0;
+
+	float moveSpeed = 0.35f;
+
 	while (running)
 	{
 		//Poll for the events which have happened in this frame
 		//https://wiki.libsdl.org/SDL_PollEvent
 		while (SDL_PollEvent(&ev))
 		{
+
+			float xDelta = 0, yDelta = 0;
+
+			vec3 camForward = newCamPos - newCamTarget;
+
+			//Normalisation (put into method)
+			float camForLength = (camForward.x * camForward.x) + (camForward.y * camForward.y) + (camForward.z * camForward.z);
+			camForLength = sqrt(camForLength);
+			camForward = camForward / camForLength;
+
+			//camForward needs inversing.
+			camForward = -camForward;
+			
+			vec3 left = vec3(0, 0, 1);
+			vec3 camLeft;
+			//Cross product (put into method)
+			camLeft.x = (camForward.y * newCamUp.z) - (camForward.z * newCamUp.y);
+			camLeft.y = (camForward.z * newCamUp.x) - (camForward.x * newCamUp.z);
+			camLeft.z = (camForward.x * newCamUp.y) - (camForward.y * newCamUp.x);
+
+			camLeft = camLeft * 2.5f;
 			//Switch case for every message we are intereted in
 			switch (ev.type)
 			{
@@ -136,31 +166,47 @@ int main(int argc, char* args[])
 					running = false;
 					break;
 				case SDLK_w:
-					newCamPos.z += 1;
-					newCamTarget.z += 1;
+					newCamPos += camForward * moveSpeed;
+					newCamTarget += camForward * moveSpeed;
 					break;
 				case SDLK_s:
-					newCamPos.z -= 1;
-					newCamTarget.z -= 1;
+					newCamPos -= camForward * moveSpeed;
+					newCamTarget -= camForward * moveSpeed;
 					break;
 				case SDLK_a:
-					newCamPos.x += 1;
-					newCamTarget.x += 1;
+					newCamPos -= camLeft * (moveSpeed);
+					newCamTarget -= camLeft * (moveSpeed );
 					break;
 				case SDLK_d:
-					newCamPos.x -= 1;
-					newCamTarget.x -= 1;
+					newCamPos += camLeft * (moveSpeed);
+					newCamTarget += camLeft * (moveSpeed);
 					break;
-				case SDLK_e:
-					newCamTarget.x += 1;
+				case SDLK_r:
+					newCamPos = vec3(0.0f, 5.0f, -10.0f);
 					break;
-				case SDLK_q:
-					newCamTarget.x -= 1;
-					break;
-				}
+				}	
+			
+			case SDL_MOUSEMOTION:
+				
+				mouseY = ev.motion.yrel;
+				mouseX = ev.motion.xrel;
+
+				xDelta = ev.motion.xrel;
+				yDelta = ev.motion.yrel;
+
+				newCamTarget.x += xDelta / -50;
+				newCamTarget.y += yDelta / -50;
 			}
+			
+
+
+
+			
 		}
 
+
+		//newCamUp.z += 0.1f;
+		//cout << newCamUp.z << "\n";
 		//Update camera position and target.
 		viewMatrix = lookAt(newCamPos, newCamTarget, newCamUp);
 		rotationMatrix = rotate(newModelRot.x, vec3(1.0f, 0.0f, 0.0f))*rotate(newModelRot.y, vec3(0.0f, 1.0f, 0.0f))*rotate(newModelRot.z, vec3(0.0f, 0.0f, 1.0f));
