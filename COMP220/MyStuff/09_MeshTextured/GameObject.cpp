@@ -32,7 +32,7 @@ void GameObject::loadDiffuseTextureFromFile(const std::string & filename)
 {
 	diffuseMap = loadTextureFromFile(filename);
 }
-void GameObject::loadShaders(const std::string & vertexShaderFilename, std::string & fragmentShaderFilename)
+void GameObject::loadShaders(const std::string & vertexShaderFilename, const std::string & fragmentShaderFilename)
 {
 	ShaderProgramID = LoadShaders(vertexShaderFilename.c_str(), fragmentShaderFilename.c_str());
 }
@@ -44,8 +44,6 @@ void GameObject::preRender()
 	glBindTexture(GL_TEXTURE_2D, diffuseMap);
 
 	GLint modelMatrixLocation = glGetUniformLocation(ShaderProgramID, "modelMatrix");
-	//GLint viewMatrixLocation = glGetUniformLocation(programID, "viewMatrix");
-	//GLint projectionMatrixLocation = glGetUniformLocation(programID, "projectionMatrix");
 	GLint textureLocation = glGetUniformLocation(ShaderProgramID, "baseTexture");
 
 	GLint ambientMaterialColourLocation = glGetUniformLocation(ShaderProgramID, "ambientMaterialColour");

@@ -55,51 +55,101 @@ int main(int argc, char* args[])
 		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, (char*)glewGetErrorString(glewError), "GLEW Init Failed", NULL);
 	}
 
-	std::vector<Mesh*> meshes;
-	loadMeshFromFile("smaug.fbx", meshes);
-	GLuint textureID = loadTextureFromFile("skin-t.tga");
-
-	vec3 trianglePosition = vec3(0.0f,-5.0f,10.0f);
-	vec3 triangleScale = vec3(1.0f, 1.0f, 1.0f);
-	vec3 triangleRotation = vec3(140.0f, 3.10f, 0.0f);
-
-	
-	mat4 translationMatrix = translate(trianglePosition);
-	mat4 scaleMatrix = scale(triangleScale);
-	mat4 rotationMatrix= rotate(triangleRotation.x, vec3(1.0f, 0.0f, 0.0f))*rotate(triangleRotation.y, vec3(0.0f, 1.0f, 0.0f))*rotate(triangleRotation.z, vec3(0.0f, 0.0f, 1.0f));
-
-	mat4 modelMatrix = translationMatrix*rotationMatrix*scaleMatrix;
-
+	//Camera
 	vec3 cameraPosition = vec3(0.0f, 5.0f, -10.0f);
 	vec3 cameraTarget = vec3(0.0f, 0.0f, 0.0f);
 	vec3 cameraUp = vec3(0.0f, 1.0f, 0.0f);
 
 	mat4 viewMatrix = lookAt(cameraPosition, cameraTarget, cameraUp);
-
 	mat4 projectionMatrix = perspective(radians(90.0f), float(800 / 600), 0.1f, 100.0f);
-
-
-	GLuint programID = LoadShaders("textureVert.glsl", "textureFrag.glsl");
-
-	GLint fragColourLocation=glGetUniformLocation(programID, "fragColour");
-	if (fragColourLocation < 0)
-	{
-		printf("Unable to find %s uniform\n", "fragColour");
-	}
 
 	static const GLfloat fragColour[] = { 0.0f,1.0f,0.0f,1.0f };
 
-	GLint currentTimeLocation= glGetUniformLocation(programID, "time");
-	if (currentTimeLocation < 0)
-	{
-		printf("Unable to find %s uniform\n", "time");
-	}
+	std::vector<GameObject*> GameObjectList;
+	//Gameobjects
+	GameObject * dragon = new GameObject;
+	dragon->setPosition(vec3(0.0f, -10.0f, 10.0f));
+	dragon->setRotation(vec3(139.5f, 3.10f, 0.0f));
+	dragon->setScale(vec3(0.5f, 0.5f, 0.5f));
+	dragon->loadMeshesFromFile("Dragon.fbx");
+	dragon->loadDiffuseTextureFromFile("Dragon (2).png");
+	dragon->loadShaders("textureVert.glsl", "textureFrag.glsl");
 
+	//GameObjectList.push_back(dragon);
+
+	GameObject * chest = new GameObject;
+	chest->loadMeshesFromFile("ChestCartoon.fbx");
+	chest->loadDiffuseTextureFromFile("chest_rare.png");
+	chest->loadShaders("textureVert.glsl", "textureFrag.glsl");
+	chest->setPosition(vec3(15.0f, -5.0f, 10.0f));
+	chest->setRotation(vec3(140.0f, 3.1f, 90.0f));
+
+	//GameObjectList.push_back(chest);
+
+	GameObject * barrel = new GameObject;
+	barrel->loadMeshesFromFile("barrel.fbx");
+	barrel->loadDiffuseTextureFromFile("barrel.png");
+	barrel->loadShaders("textureVert.glsl", "textureFrag.glsl");
+	barrel->setPosition(vec3(15.0f, -5.0f, 10.0f));
+	barrel->setRotation(vec3(0,0, 0));
+	barrel->setScale(vec3(0.1f, 0.1f, 0.1f));
+
+	//GameObjectList.push_back(barrel);
+
+
+	
+	//Particle effects
+	//Particle list
+	//Particle objects
+	GameObject * firstParticle = new GameObject;
+	firstParticle->loadMeshesFromFile("Cube.fbx");
+	firstParticle->loadDiffuseTextureFromFile("Cube.png");
+	firstParticle->loadShaders("textureVert.glsl", "textureFrag.glsl");
+	firstParticle->setPosition(vec3(0, 0, 0));
+	firstParticle->setScale(vec3(0.005f, 0.005f, 0.0f));
+
+	GameObjectList.push_back(firstParticle);
+
+#pragma region KillIt
+
+
+	/*
 	GLint modelMatrixLocation = glGetUniformLocation(programID, "modelMatrix");
 	GLint viewMatrixLocation = glGetUniformLocation(programID, "viewMatrix");
 	GLint projectionMatrixLocation = glGetUniformLocation(programID, "projectionMatrix");
 	GLint textureLocation = glGetUniformLocation(programID, "baseTexture");
+	*/
 
+	//Particle system
+	/*int maxParticles = 254;
+
+	static const GLfloat vertexBufferData[] = {
+		-0.5f,-0.5f,0.0f,
+		0.5f,-0.5f,0.0f,
+		-0.5f,0.5f,0.0f,
+		0.5f,0.5f,0.0f,
+	};
+	GLuint billboardVertexBuffer;
+	glGenBuffers(1, &billboardVertexBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, billboardVertexBuffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertexBufferData), vertexBufferData, GL_STATIC_DRAW);
+
+	GLuint particlePosBuffer;
+	glGenBuffers(1, &particlePosBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, particlePosBuffer);
+
+	glBufferData(GL_ARRAY_BUFFER, maxParticles * 4 * sizeof(GLfloat), NULL, GL_STREAM_DRAW);
+
+	GLuint particleColourBuff;
+	glGenBuffers(1, &particleColourBuff);
+	glBindBuffer(GL_ARRAY_BUFFER, particleColourBuff);
+
+	glBufferData(GL_ARRAY_BUFFER, maxParticles * 4 * sizeof(GLubyte), NULL, GL_STREAM_DRAW);
+	*/
+
+#pragma endregion
+
+	//other stuff
 	glEnable(GL_DEPTH_TEST);
 	int lastTicks = SDL_GetTicks();
 	int currentTicks = SDL_GetTicks();
@@ -114,9 +164,6 @@ int main(int argc, char* args[])
 	vec3 newCamPos = cameraPosition;
 	vec3 newCamTarget = cameraTarget;
 	vec3 newCamUp = cameraUp;
-
-	//Model pos
-	vec3 newModelRot = triangleRotation;
 
 	float mouseX = 0, mouseY = 0;
 
@@ -185,9 +232,7 @@ int main(int argc, char* args[])
 					newCamPos = vec3(0.0f, 5.0f, -10.0f);
 					break;
 				}	
-			
 			case SDL_MOUSEMOTION:
-				
 				mouseY = ev.motion.yrel;
 				mouseX = ev.motion.xrel;
 
@@ -197,68 +242,87 @@ int main(int argc, char* args[])
 				newCamTarget.x += xDelta / -50;
 				newCamTarget.y += yDelta / -50;
 			}
-			
-
-
-
-			
 		}
 
 
-		//newCamUp.z += 0.1f;
-		//cout << newCamUp.z << "\n";
-		//Update camera position and target.
+		//Camera updater
 		viewMatrix = lookAt(newCamPos, newCamTarget, newCamUp);
-		rotationMatrix = rotate(newModelRot.x, vec3(1.0f, 0.0f, 0.0f))*rotate(newModelRot.y, vec3(0.0f, 1.0f, 0.0f))*rotate(newModelRot.z, vec3(0.0f, 0.0f, 1.0f));
-		mat4 modelMatrix = translationMatrix * rotationMatrix*scaleMatrix;
 
+		//GameObject rendering
+		for (GameObject* currObj : GameObjectList)
+		{
+			currObj->update();
+		}
 
-		currentTicks = SDL_GetTicks();
-		float deltaTime = (float)(currentTicks - lastTicks) / 1000.0f;
-
+		glEnable(GL_DEPTH_TEST);
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClearDepth(1.0f);
 		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
+		GLuint currProgID = dragon->getShaderProgramID();
 
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, textureID);
+		for (GameObject* currObj : GameObjectList)
+		{
+			currObj->preRender();
+			GLint viewMatrixLocation = glGetUniformLocation(currProgID, "viewMatrix");
+			GLint projectionMatrixLocation = glGetUniformLocation(currProgID, "projectionMatrix");
 
-		glUseProgram(programID);
+			glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, value_ptr(viewMatrix));
+			glUniformMatrix4fv(projectionMatrixLocation, 1, GL_FALSE, value_ptr(projectionMatrix));
 
+			currObj->render();
+		}
+
+
+		
+		//Particle effect rendering
+
+
+		/*glBindBuffer(GL_ARRAY_BUFFER, particlePosBuffer);
+		glBufferData(GL_ARRAY_BUFFER, maxParticles * 4 * sizeof(GLfloat), NULL, GL_STREAM_DRAW);
+		glBufferSubData(GL_ARRAY_BUFFER,0, maxParticles * sizeof(GLfloat) * 4, )*/
+		
+		
+		//send shader values
+
+		//glActiveTexture(GL_TEXTURE0);
+		/*
 		glUniform4fv(fragColourLocation, 1, fragColour);
 		glUniform1f(currentTimeLocation, (float)(currentTicks)/1000.0f);
 		glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, value_ptr(modelMatrix));
 		glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, value_ptr(viewMatrix));
 		glUniformMatrix4fv(projectionMatrixLocation, 1, GL_FALSE, value_ptr(projectionMatrix));
 		glUniform1i(textureLocation, 0);
+		*/
 
-		for (Mesh *pMesh : meshes)
-		{
-			pMesh->render();
-		}
+		//EndOfLoop stuff to do
+		currentTicks = SDL_GetTicks();
+		float deltaTime = (float)(currentTicks - lastTicks) / 1000.0f;
+
 		SDL_GL_SwapWindow(window);
 
 		lastTicks = currentTicks;
 	}
 
-	auto iter = meshes.begin();
-	while (iter != meshes.end())
+	//Deleting stuff
+
+	//Deleting gameObjects
+	auto gameObjectIter = GameObjectList.begin();
+	while (gameObjectIter != GameObjectList.end()) 
 	{
-		if ((*iter))
+		if ((*gameObjectIter))
 		{
-			delete (*iter);
-			iter = meshes.erase(iter);
-		}
-		else
-		{
-			iter++;
+			(*gameObjectIter)->destroy();
+			delete (*gameObjectIter);
+			GameObjectList.erase(gameObjectIter);
 		}
 	}
 
-	meshes.clear();
-	glDeleteTextures(1, &textureID);
-	glDeleteProgram(programID);
+	
+	//Deleting particles
+
+
+	//Remember to delete all the particles 
 
 	SDL_GL_DeleteContext(GL_Context);
 	//Destroy the window and quit SDL2, NB we should do this after all cleanup in this order!!!

@@ -18,5 +18,6 @@
 #include "Texture.h"
 
 #include "GameObject.h"
+#include "Particle.h"
 
 using namespace glm;

@@ -17,7 +17,7 @@ public:
 
 	void loadMeshesFromFile(const std::string& filename);
 	void loadDiffuseTextureFromFile(const std::string& filename);
-	void loadShaders(const std::string& vertexShaderFilename, std::string& fragmentShaderFilename);
+	void loadShaders(const std::string& vertexShaderFilename, const std::string& fragmentShaderFilename);
 
 	void preRender();
 	void render();
