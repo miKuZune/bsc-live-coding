@@ -1,80 +1,132 @@
 #pragma once
 
 #include <vector>
-#include <glm\glm.hpp>
-#include <glm/gtx/transform.hpp>
+#include "glm/glm.hpp"
+#include "glm\gtx\transform.hpp"
+#include "glm/gtc/type_ptr.hpp"
 
-#include "Model.h"
 #include "Mesh.h"
+#include "Model.h"
 #include "Texture.h"
 #include "Shader.h"
-
 class GameObject
 {
 public:
 	GameObject();
 	~GameObject();
 
-	void setPos(const glm::vec3& position)
-	{
-		m_Position = position;
-	};
+	void loadMeshesFromFile(const std::string& filename);
+	void loadDiffuseTextureFromFile(const std::string& filename);
+	void loadShaders(const std::string& vertexShaderFilename, std::string& fragmentShaderFilename);
 
-	glm::vec3& getPos()
-	{
-		return m_Position;
-	};
-
-	void setScale(const glm::vec3& scale)
-	{
-		m_Scale = scale;
-	};
-
-	glm::vec3& getScale() 
-	{
-		return m_Scale;
-	};
-
-	glm::mat4& getModelMatrix() 
-	{
-		return modelMatrix;
-	};
-
-	GLuint getSharderProgramID()
-	{
-		return shaderProgramID;
-	};
-
-
-	void loadMesh(const std::string& filename);
-	void loadDiffuseMap(const std::string& filename);
-	void loadShaderProgram(const std::string & vertextShaderFilename, const std::string& fragmentShaderFilename);
-
-	void update();
-	void render();
 	void preRender();
-
+	void render();
+	void update();
 	void destroy();
 
+	//Getters and setters
 
-	//set specularPower with (float)
-	//get specular power float method to return specularpower
+	//Set gameobject position
+	void setPosition(const glm::vec3& Position)
+	{
+		position = Position;
+	}
+	//Get the position
+	const glm::vec3& getPosition()
+	{
+		return position;
+	}
+	//Set the scale of the object
+	void setScale(const glm::vec3& Scale)
+	{
+		scale = Scale;
+	}
+	//Get object scale.
+	const glm::vec3& getScale()
+	{
+		return scale;
+	}
+	//Set rotation of object
+	void setRotation(const glm::vec3& Rotation)
+	{
+		rotation = Rotation;
+	}
+	//Get the rotatoin of the object.
+	const glm::vec3& getRotation()
+	{
+		return rotation;
+	}
+	//Get the model matrix of the model.
+	const glm::mat4& getModelMatrix()
+	{
+		return modelMatrix;
+	}
+	//Get the diffuseMap of the object.
+	const GLuint getDiffuseMap()
+	{
+		return diffuseMap;
+	}
 
-	//get/set for rotation and scale.
-private:
-	std::vector<Mesh*> m_Meshes;
-	GLuint m_DiffuseMapID;
+	void setAmbientMaterialColour(const glm::vec4& colour)
+	{
+		ambientMaterialColour = colour;
+	}
 	
-	glm::vec3 m_Position;
-	glm::vec3 m_Scale;
-	glm::vec3 m_Rot;
+	const glm::vec4& getAmbientMaterialColour()
+	{
+		return ambientMaterialColour;
+	}
+
+	void setDiffuseMaterialColour(const glm::vec4& colour)
+	{
+		diffuseMaterialColour = colour;
+	}
+
+	const glm::vec4& getDiffuseMaterialColour()
+	{
+		return diffuseMaterialColour;
+	}
+
+	void setSpecularMaterialColour(const glm::vec4& colour)
+	{
+		SpecularMaterialColour = colour;
+	}
+
+	const glm::vec4& getSpecularMaterialColour()
+	{
+		return SpecularMaterialColour;
+	}
+
+	void setSpecularPower(float power)
+	{
+		specularPower = power;
+	}
+
+	const float getSpecularPower()
+	{
+		return specularPower;
+	}
+
+	const GLuint getShaderProgramID()
+	{
+		return ShaderProgramID;
+	}
+private:
+	//The mesh that is shown
+	std::vector<Mesh*> meshes;
+	//Model texture pack :^)
+	GLuint diffuseMap;
+	//Transform
+	glm::vec3 position;
+	glm::vec3 scale;
+	glm::vec3 rotation;
 	glm::mat4 modelMatrix;
 
-	//add material colours. 
-	// glm::vec4 ambientMaterialClour;
-	// glm::vec4 diffuseMaterialColour;
-	// glm::vec4 specularMaterialColour;
-	// float SpecularPower;
+	//Material
+	glm::vec4 ambientMaterialColour;
+	glm::vec4 diffuseMaterialColour;
+	glm::vec4 SpecularMaterialColour;
+	float specularPower;
 
-	GLuint shaderProgramID;
+	GLuint ShaderProgramID;
 };
