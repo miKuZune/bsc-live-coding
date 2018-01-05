@@ -114,6 +114,7 @@ public:
 private:
 	//The mesh that is shown
 	std::vector<Mesh*> meshes;
+
 	//Model texture pack :^)
 	GLuint diffuseMap;
 	//Transform

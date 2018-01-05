@@ -1,55 +1,80 @@
 #pragma once
 #include "glm\vec3.hpp"
 #include "GameObject.h"
-#include "glm/gtc/type_ptr.hpp"
 class Particle
 {
 public:
 	Particle();
 	~Particle();
-	
-	
-	void ParticleStartUp();
-	bool CheckIfLifeIsOver();
-	void ParticleMoveInDirection();
-	void RotateTowardPlayer(glm::vec3 playerPos);
 
-	void EachFrame();
+	void Initialise();
+	void SetPositionWithVel();
+	void ResetCheck();
 
-	//Set the starting pos of the particle
-	void SetStartPos(glm::vec3 startPos)
+
+
+#pragma region gettersAndSetters
+
+	glm::vec3 GetVelocity()
 	{
-		particle->setPosition(startPos);
+		return velocity;
 	}
-	//set the life time of the particles
-	void setLifeTime(float timeToDelete)
+	void SetVelocity(glm::vec3 newVel)
 	{
-		lifeTime = timeToDelete;
+		velocity = newVel;
 	}
-	//Do gameobject stuff
-	void ParticleGameObjectUpdate()
+	glm::vec3 GetNewPos()
 	{
-		particle->update();
+		return newPosition;
 	}
-	void ParticleGameObjectPreRender()
+	glm::vec3 GetStartPos()
 	{
-		particle->preRender();
+		return startingPosition;
 	}
-	void ParticleGameObjectRender()
+	void SetStartPos(glm::vec3 newStartPos)
 	{
-		particle->render();
+		startingPosition = newStartPos;
 	}
-	//Destroy this
-	void Destroy()
+	float GetTimeAlive()
 	{
-		delete(particle);
+		return timeAlive;
 	}
+	void SetTimeAlive(float newTimeAlive)
+	{
+		timeAlive = newTimeAlive;
+	}
+	float GetTimeToReset()
+	{
+		return timeToReset;
+	}
+	void SetTimeToReset(float newTime)
+	{
+		timeToReset = newTime;
+	}
+
+	GameObject GetGameObj()
+	{
+		return * particle;
+	}
+	void setGameObj(GameObject newGO)
+	{
+		particle = &newGO;
+	}
+
+#pragma endregion
+
+
 private:
-	
+	//Stores the particle gameobject
 	GameObject * particle;
-
+	//The velocity used to move the particle and the variable to calculate the new position.
 	glm::vec3 velocity;
-
-	float lifeTime;
+	glm::vec3 newPosition;
+	//Starting position used when reseting the particle.
+	glm::vec3 startingPosition;
+	//Used to calculate time to check if the particle needs to be reset
 	float timeAlive;
+	float timeToReset;
+
+	
 };

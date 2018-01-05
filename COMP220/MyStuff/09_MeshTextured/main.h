@@ -17,6 +17,9 @@
 #include "Shader.h"
 #include "Texture.h"
 
+#include <time.h>
+#include <ctime>
+
 #include "GameObject.h"
 #include "Particle.h"
 

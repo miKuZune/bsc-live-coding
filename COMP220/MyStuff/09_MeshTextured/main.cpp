@@ -7,6 +7,8 @@ using namespace std;
 
 int main(int argc, char* args[])
 {
+#pragma region WindowInitalisation
+
 	//Initialises the SDL Library, passing in SDL_INIT_VIDEO to only initialise the video subsystems
 	//https://wiki.libsdl.org/SDL_Init
 	if (SDL_Init(SDL_INIT_VIDEO) < 0)
@@ -55,6 +57,10 @@ int main(int argc, char* args[])
 		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, (char*)glewGetErrorString(glewError), "GLEW Init Failed", NULL);
 	}
 
+#pragma endregion
+
+#pragma region CameraAndMatricies
+
 	//Camera
 	vec3 cameraPosition = vec3(0.0f, 5.0f, -10.0f);
 	vec3 cameraTarget = vec3(0.0f, 0.0f, 0.0f);
@@ -65,6 +71,19 @@ int main(int argc, char* args[])
 
 	static const GLfloat fragColour[] = { 0.0f,1.0f,0.0f,1.0f };
 
+	//Movement variables
+	vec3 newCamPos = cameraPosition;
+	vec3 newCamTarget = cameraTarget;
+	vec3 newCamUp = cameraUp;
+
+	float mouseX = 0, mouseY = 0;
+
+	float moveSpeed = 0.35f;
+#pragma endregion
+
+#pragma region MainGameObjects
+
+	//List to store and deal with all game objects during runtime
 	std::vector<GameObject*> GameObjectList;
 	//Gameobjects
 	GameObject * dragon = new GameObject;
@@ -75,7 +94,7 @@ int main(int argc, char* args[])
 	dragon->loadDiffuseTextureFromFile("Dragon (2).png");
 	dragon->loadShaders("textureVert.glsl", "textureFrag.glsl");
 
-	//GameObjectList.push_back(dragon);
+	GameObjectList.push_back(dragon);
 
 	GameObject * chest = new GameObject;
 	chest->loadMeshesFromFile("ChestCartoon.fbx");
@@ -84,7 +103,7 @@ int main(int argc, char* args[])
 	chest->setPosition(vec3(15.0f, -5.0f, 10.0f));
 	chest->setRotation(vec3(140.0f, 3.1f, 90.0f));
 
-	//GameObjectList.push_back(chest);
+	GameObjectList.push_back(chest);
 
 	GameObject * barrel = new GameObject;
 	barrel->loadMeshesFromFile("barrel.fbx");
@@ -94,83 +113,74 @@ int main(int argc, char* args[])
 	barrel->setRotation(vec3(0,0, 0));
 	barrel->setScale(vec3(0.1f, 0.1f, 0.1f));
 
-	//GameObjectList.push_back(barrel);
-
-
-	
-	//Particle effects
-	//Particle list
-	//Particle objects
-	GameObject * firstParticle = new GameObject;
-	firstParticle->loadMeshesFromFile("Cube.fbx");
-	firstParticle->loadDiffuseTextureFromFile("Cube.png");
-	firstParticle->loadShaders("textureVert.glsl", "textureFrag.glsl");
-	firstParticle->setPosition(vec3(0, 0, 0));
-	firstParticle->setScale(vec3(0.005f, 0.005f, 0.0f));
-
-	GameObjectList.push_back(firstParticle);
-
-#pragma region KillIt
-
-
-	/*
-	GLint modelMatrixLocation = glGetUniformLocation(programID, "modelMatrix");
-	GLint viewMatrixLocation = glGetUniformLocation(programID, "viewMatrix");
-	GLint projectionMatrixLocation = glGetUniformLocation(programID, "projectionMatrix");
-	GLint textureLocation = glGetUniformLocation(programID, "baseTexture");
-	*/
-
-	//Particle system
-	/*int maxParticles = 254;
-
-	static const GLfloat vertexBufferData[] = {
-		-0.5f,-0.5f,0.0f,
-		0.5f,-0.5f,0.0f,
-		-0.5f,0.5f,0.0f,
-		0.5f,0.5f,0.0f,
-	};
-	GLuint billboardVertexBuffer;
-	glGenBuffers(1, &billboardVertexBuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, billboardVertexBuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertexBufferData), vertexBufferData, GL_STATIC_DRAW);
-
-	GLuint particlePosBuffer;
-	glGenBuffers(1, &particlePosBuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, particlePosBuffer);
-
-	glBufferData(GL_ARRAY_BUFFER, maxParticles * 4 * sizeof(GLfloat), NULL, GL_STREAM_DRAW);
-
-	GLuint particleColourBuff;
-	glGenBuffers(1, &particleColourBuff);
-	glBindBuffer(GL_ARRAY_BUFFER, particleColourBuff);
-
-	glBufferData(GL_ARRAY_BUFFER, maxParticles * 4 * sizeof(GLubyte), NULL, GL_STREAM_DRAW);
-	*/
+	GameObjectList.push_back(barrel);
 
 #pragma endregion
 
-	//other stuff
+#pragma region ParticleGameObjects
+	//Creating GameObjects to use as particle effects
+	const int particleAmount = 50;
+	GameObject * particleArry[particleAmount];
+	for (int i = 0; i < particleAmount; i++)
+	{
+		particleArry[i] = new GameObject;
+		particleArry[i]->loadMeshesFromFile("Cube.fbx");
+		particleArry[i]->loadDiffuseTextureFromFile("Cube.png");
+		particleArry[i]->loadShaders("textureVert.glsl", "textureFrag.glsl");
+		particleArry[i]->setPosition(vec3(0, 0, 0));
+		particleArry[i]->setScale(vec3(0.005f, 0.005f, 0.0f));
+		GameObjectList.push_back(particleArry[i]);
+	}
+#pragma endregion
+
+#pragma region LoopStuff
+
+	//Loop handling
 	glEnable(GL_DEPTH_TEST);
 	int lastTicks = SDL_GetTicks();
 	int currentTicks = SDL_GetTicks();
 
-
-	//Event loop, we will loop until running is set to false, usually if escape has been pressed or window is closed
+	//whether or not the game is running
 	bool running = true;
 	//SDL Event structure, this will be checked in the while loop
 	SDL_Event ev;
+#pragma endregion
 
-	//Movement vari
-	vec3 newCamPos = cameraPosition;
-	vec3 newCamTarget = cameraTarget;
-	vec3 newCamUp = cameraUp;
+#pragma region ParticleInitalisation
+	//Variables for moving the particles during runtime
+	vec3 particleVel = vec3(0.0f,-0.1f, -0.1f);
+	vec3 newPos;
+	int velocityCounter = 0;
+	vec3 velocities[particleAmount];
+	//Variables used for randomising the direction of particle movement
+	float one = 0, two = 0, three = 0;
+	srand(time(NULL));
 
-	float mouseX = 0, mouseY = 0;
+	float timesToLive[particleAmount];
+	float timesAlive[particleAmount];
+	float temp;
+	//Loop to deal with all of the randomising of the particles
+	for (int i = 0; i < particleAmount; i++)
+	{
+		//Randomising the velocity of the particles.
+		one = (rand() % 200) ;
+		two = (rand() % 100 + -100) ;
+		three = (rand() % 100 + -100);
+		velocities[i] = vec3((one - 100)/500,two/500,three/100);
+		//Randomising the lifetime of the particles.
+		temp = rand() % 100;
+		timesToLive[i] = temp / 100;
+		timesAlive[i] = 0;
+	}
+#pragma endregion
 
-	float moveSpeed = 0.35f;
+#pragma region MainLoop
+
+
 
 	while (running)
 	{
+#pragma region EventHandler
 		//Poll for the events which have happened in this frame
 		//https://wiki.libsdl.org/SDL_PollEvent
 		while (SDL_PollEvent(&ev))
@@ -185,9 +195,8 @@ int main(int argc, char* args[])
 			camForLength = sqrt(camForLength);
 			camForward = camForward / camForLength;
 
-			//camForward needs inversing.
 			camForward = -camForward;
-			
+
 			vec3 left = vec3(0, 0, 1);
 			vec3 camLeft;
 			//Cross product (put into method)
@@ -222,7 +231,7 @@ int main(int argc, char* args[])
 					break;
 				case SDLK_a:
 					newCamPos -= camLeft * (moveSpeed);
-					newCamTarget -= camLeft * (moveSpeed );
+					newCamTarget -= camLeft * (moveSpeed);
 					break;
 				case SDLK_d:
 					newCamPos += camLeft * (moveSpeed);
@@ -231,7 +240,7 @@ int main(int argc, char* args[])
 				case SDLK_r:
 					newCamPos = vec3(0.0f, 5.0f, -10.0f);
 					break;
-				}	
+				}
 			case SDL_MOUSEMOTION:
 				mouseY = ev.motion.yrel;
 				mouseX = ev.motion.xrel;
@@ -243,10 +252,14 @@ int main(int argc, char* args[])
 				newCamTarget.y += yDelta / -50;
 			}
 		}
+#pragma endregion
 
+		
+#pragma region rendering
 
-		//Camera updater
+		//Camera updated every frame
 		viewMatrix = lookAt(newCamPos, newCamTarget, newCamUp);
+
 
 		//GameObject rendering
 		for (GameObject* currObj : GameObjectList)
@@ -274,41 +287,56 @@ int main(int argc, char* args[])
 		}
 
 
-		
-		//Particle effect rendering
+#pragma endregion
 
-
-		/*glBindBuffer(GL_ARRAY_BUFFER, particlePosBuffer);
-		glBufferData(GL_ARRAY_BUFFER, maxParticles * 4 * sizeof(GLfloat), NULL, GL_STREAM_DRAW);
-		glBufferSubData(GL_ARRAY_BUFFER,0, maxParticles * sizeof(GLfloat) * 4, )*/
-		
-		
-		//send shader values
-
-		//glActiveTexture(GL_TEXTURE0);
-		/*
-		glUniform4fv(fragColourLocation, 1, fragColour);
-		glUniform1f(currentTimeLocation, (float)(currentTicks)/1000.0f);
-		glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, value_ptr(modelMatrix));
-		glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, value_ptr(viewMatrix));
-		glUniformMatrix4fv(projectionMatrixLocation, 1, GL_FALSE, value_ptr(projectionMatrix));
-		glUniform1i(textureLocation, 0);
-		*/
-
-		//EndOfLoop stuff to do
+#pragma region GeneralStuff
+		//Delta time and window displaying
 		currentTicks = SDL_GetTicks();
 		float deltaTime = (float)(currentTicks - lastTicks) / 1000.0f;
-
 		SDL_GL_SwapWindow(window);
 
 		lastTicks = currentTicks;
+#pragma endregion
+
+#pragma region ParticleRuntimeHandling
+		//Loop to deal particles during runtime.
+		//(Placed here to make use of the delta time variable)
+		for (int i = 0; i < particleAmount; i++)
+		{
+			//Moves the current particle by the appropriate velocity of the same position.
+			newPos = particleArry[i]->getPosition();
+			newPos = newPos + velocities[i];
+			/*velocityCounter++;
+			if (velocityCounter >= particleAmount)
+			{
+				velocityCounter = 0;
+			}*/
+			particleArry[i]->setPosition(newPos);
+
+			if (timesAlive[i] > timesToLive[i])
+			{
+				particleArry[i]->setPosition(vec3(0, 0, 0));
+
+				temp = rand() % 100;
+				one = rand() % 200;
+				two = (rand() % 100 + -100);
+				three = (rand() % 100 + -100);
+				timesToLive[i] = temp / 100;
+				velocities[i] = vec3((one - 100) / 500, two / 500, three / 100);
+				timesAlive[i] = 0;
+			}
+			timesAlive[i] += deltaTime;
+		}
+#pragma endregion
+
 	}
 
-	//Deleting stuff
+#pragma endregion
 
+#pragma region EndOfApplicationCleanup
 	//Deleting gameObjects
 	auto gameObjectIter = GameObjectList.begin();
-	while (gameObjectIter != GameObjectList.end()) 
+	while (gameObjectIter != GameObjectList.end())
 	{
 		if ((*gameObjectIter))
 		{
@@ -318,7 +346,7 @@ int main(int argc, char* args[])
 		}
 	}
 
-	
+
 	//Deleting particles
 
 
@@ -332,4 +360,6 @@ int main(int argc, char* args[])
 	SDL_Quit();
 
 	return 0;
+#pragma endregion
+
 }
