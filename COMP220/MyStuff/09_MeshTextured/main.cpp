@@ -5,6 +5,72 @@
 
 using namespace std;
 
+#pragma region Methods
+//Check if one object has collided with another
+bool CheckForCollision(GameObject obj1, GameObject obj2)
+{
+
+	bool hasCollided = false;
+	//Get the current particle position and scale to build a check area
+	vec3 obj1Pos = obj1.getPosition();
+	vec3 obj2Pos = obj2.getPosition();
+
+	vec3 obj1UpperLimit = obj1Pos + obj1.getScale();
+	vec3 obj2UpperLImit = obj2Pos + obj2.getScale();
+
+	//Check if obj1 and obj2 are "touching" (in the same region as each other).
+	if (obj1Pos.x >= obj2Pos.x && obj1Pos.y >= obj2Pos.y && obj1Pos.z >= obj2Pos.z)
+	{
+		if (obj1UpperLimit.x <= obj2UpperLImit.x && obj1UpperLimit.y <= obj2UpperLImit.y && obj1UpperLimit.z <= obj2UpperLImit.z)
+		{
+			hasCollided = true;
+		}
+	}
+	return hasCollided;
+}
+
+//Setup gameobjects for the particles
+void particleGOsetup(int particleAmount, GameObject * particleArry[], std::vector<GameObject *> GOlist, std::vector<GameObject *> particleList)
+{
+	//Loop through array of particles
+	for (int i = 0; i < particleAmount; i++)
+	{
+		//Creates a gameobject for each particle.
+		particleArry[i] = new GameObject;
+		particleArry[i]->loadMeshesFromFile("Cube.fbx");
+		particleArry[i]->loadDiffuseTextureFromFile("Cube.png");
+		particleArry[i]->loadShaders("textureVert.glsl", "textureFrag.glsl");
+		particleArry[i]->setPosition(vec3(0, 0, 0));
+		particleArry[i]->setScale(vec3(0.005f, 0.005f, 0.0f));
+		//Adds these partices to the GameObject list (for rendering) and to it's own particle list
+		GOlist.push_back(particleArry[i]);
+		particleList.push_back(particleArry[i]);
+	}
+}
+float x = 0, y = 0, z = 0, temp = 0;
+//Give each particle in an array it's own random variables
+void particleInitalise(float particleAmount, vec3 velocities[], float timesToLive[], float timesAlive[], const int velRange, int secondsToLiveMax)
+{
+
+	//Loop through
+	for (int i = 0; i < particleAmount; i++)
+	{
+		//Randomising the velocity of the particles.
+		x = (rand() % velRange);
+		y = (rand() % velRange / 2 + -(velRange / 2));
+		z = (rand() % velRange / 2 + -(velRange / 2));
+		velocities[i] = vec3((x - velRange / 2) / (velRange * 5), y / (velRange * 5), z / (velRange / 2));
+		//Randomising the lifetime of the particles.
+		temp = rand() % secondsToLiveMax;
+		timesToLive[i] = temp / secondsToLiveMax;
+		timesAlive[i] = 0;
+	}
+}
+
+#pragma endregion
+
+
+
 int main(int argc, char* args[])
 {
 #pragma region WindowInitalisation
@@ -61,7 +127,7 @@ int main(int argc, char* args[])
 
 #pragma region CameraAndMatricies
 
-	//Camera
+	//Camera variables.
 	vec3 cameraPosition = vec3(0.0f, 5.0f, -10.0f);
 	vec3 cameraTarget = vec3(0.0f, 0.0f, 0.0f);
 	vec3 cameraUp = vec3(0.0f, 1.0f, 0.0f);
@@ -72,12 +138,11 @@ int main(int argc, char* args[])
 	static const GLfloat fragColour[] = { 0.0f,1.0f,0.0f,1.0f };
 
 	//Movement variables
+	//Used to change the position target and up of the camera during runtime.
 	vec3 newCamPos = cameraPosition;
 	vec3 newCamTarget = cameraTarget;
 	vec3 newCamUp = cameraUp;
-
-	float mouseX = 0, mouseY = 0;
-
+	//How fast the player moves.
 	float moveSpeed = 0.35f;
 #pragma endregion
 
@@ -87,6 +152,7 @@ int main(int argc, char* args[])
 	//This list will be used to render all of the gameobjects in the scene.
 	std::vector<GameObject*> GameObjectList;
 	//Gameobjects
+	//Dragon gameobject
 	GameObject * dragon = new GameObject;
 	dragon->setPosition(vec3(0.0f, -10.0f, 10.0f));
 	dragon->setRotation(vec3(139.5f, 3.10f, 0.0f));
@@ -94,9 +160,8 @@ int main(int argc, char* args[])
 	dragon->loadMeshesFromFile("Dragon.fbx");
 	dragon->loadDiffuseTextureFromFile("Dragon (2).png");
 	dragon->loadShaders("textureVert.glsl", "textureFrag.glsl");
-
 	GameObjectList.push_back(dragon);
-
+	//Chest gameobject
 	GameObject * chest = new GameObject;
 	chest->loadMeshesFromFile("ChestCartoon.fbx");
 	chest->loadDiffuseTextureFromFile("chest_rare.png");
@@ -107,7 +172,7 @@ int main(int argc, char* args[])
 	bool chestOnFire = false;
 	float timeOnFire = 0;
 	GameObjectList.push_back(chest);
-
+	//Barrel gameobject
 	GameObject * barrel = new GameObject;
 	barrel->loadMeshesFromFile("barrel.fbx");
 	barrel->loadDiffuseTextureFromFile("barrel.png");
@@ -127,37 +192,17 @@ int main(int argc, char* args[])
 	//Creating GameObjects to use as particle effects
 	const int particleAmount = 50;
 	GameObject * particleArry[particleAmount];
-	for (int i = 0; i < particleAmount; i++)
-	{
-		particleArry[i] = new GameObject;
-		particleArry[i]->loadMeshesFromFile("Cube.fbx");
-		particleArry[i]->loadDiffuseTextureFromFile("Cube.png");
-		particleArry[i]->loadShaders("textureVert.glsl", "textureFrag.glsl");
-		particleArry[i]->setPosition(vec3(0, 0, 0));
-		particleArry[i]->setScale(vec3(0.005f, 0.005f, 0.0f));
-		GameObjectList.push_back(particleArry[i]);
-		ParticleList.push_back(particleArry[i]);
-	}
+	particleGOsetup(particleAmount, particleArry, GameObjectList, ParticleList);
 
 	//Creating GOs for the chest fire particles
 	std::vector<GameObject *> chestParticles;
 	const int chestParCount = particleAmount / 5;
 	GameObject * chestPartArry[chestParCount];
 	
-	for (int i = 0; i < chestParCount; i++)
-	{
-		chestPartArry[i] = new GameObject;
-		chestPartArry[i]->loadMeshesFromFile("Cube.fbx");
-		chestPartArry[i]->loadDiffuseTextureFromFile("Cube.png");
-		chestPartArry[i]->loadShaders("textureVert.glsl", "textureFrag.glsl");
-		chestPartArry[i]->setPosition(chest->getPosition());
-		chestPartArry[i]->setScale(vec3(0.005f, 0.005f, 0.0f));
-		GameObjectList.push_back(chestPartArry[i]);
-		chestParticles.push_back(chestPartArry[i]);
-	}
+	particleGOsetup(chestParCount, chestPartArry, GameObjectList, chestParticles);
 #pragma endregion
 
-#pragma region LoopStuff
+#pragma region LoopSetup
 
 	//Loop handling
 	glEnable(GL_DEPTH_TEST);
@@ -176,29 +221,22 @@ int main(int argc, char* args[])
 
 	vec3 velocities[particleAmount];
 	//Variables used for randomising the direction of particle movement
-	float x = 0, y = 0, z = 0;
+					//float x = 0, y = 0, z = 0;
 	srand(time(NULL));
 
 	//Dragon breath particles
 	float timesToLive[particleAmount];
 	float timesAlive[particleAmount];
-	float temp;
-	//Loop to deal with giving all particles random vairables.
-	for (int i = 0; i < particleAmount; i++)
-	{
-		//Randomising the velocity of the particles.
-		x = (rand() % 200) ;
-		y = (rand() % 100 + -100) ;
-		z = (rand() % 100 + -100);
-		velocities[i] = vec3((x - 100)/500,y/500,z/100);
-		//Randomising the lifetime of the particles.
-		temp = rand() % 100;
-		timesToLive[i] = temp / 100;
-		timesAlive[i] = 0;
-	}
+	int velRange = 200;
+	int milisecondsToLiveMax = 100;
+							//float temp;
+
+
+	particleInitalise(particleAmount,velocities, timesToLive, timesAlive, velRange, milisecondsToLiveMax);
 
 
 	//Chest particles setting random variables
+	//Dosn't use method as it isn't doing any randomisation
 	vec3 chestVelocities[chestParCount];
 	float chestParTimeToLive[chestParCount];
 	float chestParTimeAlive[chestParCount];
@@ -216,8 +254,7 @@ int main(int argc, char* args[])
 
 
 	while (running)
-	{
-		
+	{	
 
 #pragma region EventHandler
 		
@@ -265,26 +302,31 @@ int main(int argc, char* args[])
 				{
 					//Escape key
 				case SDLK_ESCAPE:
+					//Quits the main game loop
 					running = false;
 					break;
 				case SDLK_w:
+					//Move forward
 					newCamPos += camForward * moveSpeed;
 					newCamTarget += camForward * moveSpeed;
 					break;
 				case SDLK_s:
+					//Move backwards
 					newCamPos -= camForward * moveSpeed;
 					newCamTarget -= camForward * moveSpeed;
 					break;
 				case SDLK_a:
+					//Move left
 					newCamPos -= camLeft * (moveSpeed);
 					newCamTarget -= camLeft * (moveSpeed);
 					break;
 				case SDLK_d:
+					//Move right
 					newCamPos += camLeft * (moveSpeed);
 					newCamTarget += camLeft * (moveSpeed);
 					break;
 				case SDLK_e:
-					
+					//Picks up the chest and moves it.
 					vec3 chestPos = chest->getPosition();
 					vec3 chestPosUpperLimit = chestPos + chest->getScale();
 					rayEndPos = newCamPos + (camForward * 20.0f);
@@ -293,9 +335,6 @@ int main(int argc, char* args[])
 					break;
 				}
 			case SDL_MOUSEMOTION:
-				mouseY = ev.motion.yrel;
-				mouseX = ev.motion.xrel;
-
 				xDelta = ev.motion.xrel;
 				yDelta = ev.motion.yrel;
 
@@ -342,44 +381,32 @@ int main(int argc, char* args[])
 
 
 #pragma region Collision
-		vec3 checkObjUpperLimit;
-		vec3 checkObj;
-
-		checkObj = chest->getPosition();
-		checkObjUpperLimit = checkObj + chest->getScale();
-
-
 		//Checks if the chest has collided with any of the particles in the particle list.
 		for (GameObject* currParticle : ParticleList)
 		{
-			//Get the current particle position and scale to build a check area 
-			vec3 currPartPos = currParticle->getPosition();
-			vec3 currPartUpperLim = currParticle->getScale() + currPartPos;
 
 			//Check if the particles and the chest have touched
-			if (currPartPos.x >= checkObj.x && currPartPos.y >= checkObj.y && currPartPos.z >= checkObj.z)
+			if (CheckForCollision(*currParticle, *chest))
 			{
-				if (currPartUpperLim.x <= checkObjUpperLimit.x && currPartUpperLim.y <= checkObjUpperLimit.y && currPartUpperLim.z <= checkObjUpperLimit.z)
+				//Set chest on fire if true
+				chestOnFire = true;
+				timeOnFire = 0;
+
+				//Setup particles when chest is set on fire
+				//Dosn't use method as the setup for randomisation is different
+				for (int i = 0; i < chestParCount; i++)
 				{
-					chestOnFire = true;
-					timeOnFire = 0;
-					//Setup particles when chest is set on fire
-					for (int i = 0; i < chestParCount; i++)
-					{
-						//Randomising the velocity of the particles.
-						x = (rand() % 200);
-						y = (rand() % 200);
-						z = (rand() % 100);
-						chestVelocities[i] = vec3((x - 100) / 500, y / 500, z / 100);
-						//Randomising the lifetime of the particles.
-						temp = rand() % 100;
-						chestParTimeToLive[i] = temp / 100;
-						chestParTimeAlive[i] = 0;
-						cout << chestVelocities[i].x << "\n";
-					}
+					//Randomising the velocity of the particles.
+					x = (rand() % 200);
+					y = (rand() % 200);
+					z = (rand() % 100);
+					chestVelocities[i] = vec3((x - 100) / 500, y / 500, z / 100);
+					//Randomising the lifetime of the particles.
+					temp = rand() % 100;
+					chestParTimeToLive[i] = temp / 100;
+					chestParTimeAlive[i] = 0;
 				}
 			}
-		}
 
 #pragma endregion
 
@@ -418,7 +445,7 @@ int main(int argc, char* args[])
 #pragma endregion
 
 
-#pragma region GeneralStuff
+#pragma region Time
 		//Delta time and window displaying
 		currentTicks = SDL_GetTicks();
 		float deltaTime = (float)(currentTicks - lastTicks) / 1000.0f;
@@ -506,7 +533,7 @@ int main(int argc, char* args[])
 		{
 			(*gameObjectIter)->destroy();
 			delete (*gameObjectIter);
-			GameObjectList.erase(gameObjectIter);
+			gameObjectIter = GameObjectList.erase(gameObjectIter);
 		}
 	}
 

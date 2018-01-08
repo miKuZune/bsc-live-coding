@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -22,7 +22,7 @@
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{0B4A1712-CCAB-4339-A620-B8754141411D}</ProjectGuid>
     <RootNamespace>My0_SDL_Window</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -91,10 +91,10 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>C:\Users\Max\Desktop\GitHub\bsc-live-coding\Libraries\SDL2_image-2.0.1\include;C:\Users\Max\Desktop\GitHub\bsc-live-coding\Libraries\assimp\include;C:\Users\Max\Desktop\GitHub\bsc-live-coding\Libraries\glm-0.9.9-a1;C:\Users\Max\Desktop\GitHub\bsc-live-coding\Libraries\glew-2.1.0\include;C:\Users\Max\Desktop\GitHub\bsc-live-coding\Libraries\SDL2-2.0.6\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Max\Desktop\GitHub\Second Year\bsc-live-coding\Libraries\SDL2_image-2.0.1\include;C:\Users\Max\Desktop\GitHub\Second Year\bsc-live-coding\Libraries\assimp\include;C:\Users\Max\Desktop\GitHub\Second Year\bsc-live-coding\Libraries\glm-0.9.9-a1;C:\Users\Max\Desktop\GitHub\Second Year\bsc-live-coding\Libraries\glew-2.1.0\include;C:\Users\Max\Desktop\GitHub\Second Year\bsc-live-coding\Libraries\SDL2-2.0.6\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>C:\Users\Max\Desktop\GitHub\bsc-live-coding\Libraries\SDL2_image-2.0.1\lib\x64;C:\Users\Max\Desktop\GitHub\bsc-live-coding\Libraries\assimp\lib;C:\Users\Max\Desktop\GitHub\bsc-live-coding\Libraries\SDL2-2.0.6\lib\x64;C:\Users\Max\Desktop\GitHub\bsc-live-coding\Libraries\glew-2.1.0\lib\Release\x64;C:\Users\Max\Desktop\GitHub\bsc-live-coding\Libraries\glm-0.9.9-a1;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Users\Max\Desktop\GitHub\Second Year\bsc-live-coding\Libraries\SDL2_image-2.0.1\lib\x64;C:\Users\Max\Desktop\GitHub\Second Year\bsc-live-coding\Libraries\assimp\lib;C:\Users\Max\Desktop\GitHub\Second Year\bsc-live-coding\Libraries\SDL2-2.0.6\lib\x64;C:\Users\Max\Desktop\GitHub\Second Year\bsc-live-coding\Libraries\glew-2.1.0\lib\Release\x64;C:\Users\Max\Desktop\GitHub\Second Year\bsc-live-coding\Libraries\glm-0.9.9-a1;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>SDL2_image.lib;SDL2.lib;SDL2main.lib;OpenGL32.lib;glew32.lib;assimp-vc140-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Console</SubSystem>
     </Link>
